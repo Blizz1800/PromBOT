@@ -1,9 +1,13 @@
+.gitignore
+*.cfg
+.env
+Dockerfile
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-pyvenv.cfg
-
 
 # C extensions
 *.so
