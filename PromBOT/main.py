@@ -2,17 +2,83 @@ from telegram import Update, ChatMemberBanned, ChatMemberLeft
 from telegram.constants import ChatAction
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 
-import asyncio
-
 from dotenv import load_dotenv
 from os import getenv
 
+from datetime import datetime
+
+DB_NAME = "db_users"
+CACHE_NAME = "db_cache"
+
+
+BLIZZ = 1287864142
+
+ADMINS = [
+    BLIZZ
+]
+
+def store_db(id, *params) -> None:
+    insert = True
+
+    db = open(f"./{DB_NAME}.txt", 'w+')
+
+    for i in db.readlines():
+        if i == "\n":
+            break
+        if i.split("\0")[0] == str(id):
+            insert = False
+            break
+
+    if insert:
+
+        cache = open(f"./{CACHE_NAME}.txt", 'w+')
+        try:
+            maxusers = int(cache.readline())
+        except:
+            maxusers = 0
+        maxusers += 1
+        cache.write(str(maxusers))
+        cache.close()
+
+        db.close()
+        db = open(f"./{DB_NAME}.txt", 'a')
+        db_entry = "f{id}"
+        for i in params:
+            if i != params[-1]:
+                db_entry += "\0"
+            db_entry += f"{i}"
+        if (db.writable):
+            db.write(f"{db_entry}\n")
+        else:
+            db.close()
+            return db_entry
+    db.close()
+    return
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
+    
+    id = update.effective_chat.id
+    name = f"{update.effective_chat.first_name} {update.effective_chat.last_name}"
+    user = f"@{update.effective_chat.username}"
+
+    msg = store_db(id, name, user)
+    if msg is not None:
+        await context.bot.send_message(chat_id=BLIZZ, text=f"El archivo db.txt no se puede escribir, estos son los datos del usuario: \n{msg}")
+
+
     commands = ""
     for i in COMMANDS:
         commands += f"/{i}\n"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"I'm a bot, please talk to me!\nThere are my commands: \n{commands}")
+
+async def dump_db(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.effective_chat.id in ADMINS:
+        await context.bot.send_chat_action(update.effective_chat.id, ChatAction.UPLOAD_DOCUMENT)
+        await context.bot.send_document(chat_id=update.effective_chat.id, document=open(f"./{DB_NAME}.txt", 'rb'), filename="db.txt", caption=f"{datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S')}")
+        return
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Usted no es *BOT\\_ADMIN*", parse_mode='MarkdownV2')
+    
 
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
@@ -49,6 +115,14 @@ async def get_doc(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.UPLOAD_DOCUMENT)
     await context.bot.send_document(chat_id=update.effective_chat.id, document=open('test.txt', 'rb'), caption='Test Document')
 
+async def db_len(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
+    if update.effective_message.chat.id not in ADMINS:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Usted no es *BOT\\_ADMIN*", parse_mode='MarkdownV2')
+        return
+    len_c = open(f"./{CACHE_NAME}.txt", 'r').readline()
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Usuarios del Bot: ```{len_c}```', parse_mode='MarkdownV2')
+
 COMMANDS = [
     'start',
     'im_user',
@@ -56,6 +130,8 @@ COMMANDS = [
     'get_loc',
     'get_ctc',
     'get_doc',
+    'dump_db',
+    'db_len',
     'get_id'
 ]
 
@@ -66,12 +142,15 @@ HANDLERS = [
     CommandHandler('get_loc', get_loc),
     CommandHandler('get_ctc', get_ctc),
     CommandHandler('get_doc', get_doc),
-
+    CommandHandler('dump_db', dump_db),
+    CommandHandler('db_len', db_len),
     CommandHandler('get_id', get_id)
 ]
 
+
 # Funcion Principal
 def main():
+    load_dotenv()
     app = ApplicationBuilder().token(getenv('TOKEN')).build()
     app.add_handlers(HANDLERS)
 
@@ -82,6 +161,4 @@ def main():
 
 # Buenas Practicas
 if __name__ == '__main__':
-    
-    load_dotenv()
     main()

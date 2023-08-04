@@ -13,4 +13,4 @@ RUN source /app/bin/activate
 # RUN pip install --upgrade pip
 RUN pip install -r /app/requirements.txt
 
-CMD ["python3", "main.py"]
+CMD ["python3", "-m", "PromBOT"]
