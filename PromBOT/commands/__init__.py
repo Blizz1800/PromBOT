@@ -4,4 +4,4 @@ from os import getenv
 
 load_dotenv()
 
-DB = MongoClient(getenv("MONGO_URI"))
+DB = MongoClient(getenv("MONGO_URI"))['vendermejor']

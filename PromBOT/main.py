@@ -1,9 +1,9 @@
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 
 from dotenv import load_dotenv
 from os import getenv
 
-from commands import start, im_user, get_gid, get_loc, get_ctc, get_doc, dump_db, db_len, get_id
+from commands import start, im_user, get_gid, get_loc, get_ctc, get_doc, db_len, get_id
 
 HANDLERS = [
     CommandHandler('start', start.start),
@@ -12,7 +12,6 @@ HANDLERS = [
     CommandHandler('get_loc', get_loc.get_loc),
     CommandHandler('get_ctc', get_ctc.get_ctc),
     CommandHandler('get_doc', get_doc.get_doc),
-    CommandHandler('dump_db', dump_db.dump_db),
     CommandHandler('db_len', db_len.db_len),
     CommandHandler('get_id', get_id.get_id)
 ]
