@@ -40,7 +40,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             referral = DB['users'].find_one({"t_id": _self['referrer']})
             if _self['referrer'] is not None:
-                context.bot.send_message(id, text=f"You have already referred to @{referral['user']}")
+                if referral['user'] is not None:
+                    context.bot.send_message(id, text=f"You have already referred to @{referral['user']}")
+                else:
+                    context.bot.send_message(id, text=f"You have already referred to {referral['name']} ({referral['t_id']})")
             else:
                 DB['users'].update_one({"t_id": id}, {"$set": {'referrer': referrer}})
                 DB['users'].update_one({"t_id": referrer}, {"$push": {'referrals': id}})
