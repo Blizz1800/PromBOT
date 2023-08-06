@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Messa
 from dotenv import load_dotenv
 from os import getenv
 
-from commands import start, im_user, get_gid, get_loc, get_ctc, get_doc, db_len, get_id, referir, referidos
+from .commands import start, im_user, get_gid, get_loc, get_ctc, get_doc, db_len, get_id, referir, referidos
 
 HANDLERS = [
     CommandHandler('start', start.start),
