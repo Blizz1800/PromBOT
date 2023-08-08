@@ -1,5 +1,5 @@
-DB_NAME = "db_users"
 BLIZZ = 1287864142
+TOKEN_NAME = ["Token", "Tokens"]
 
 ADMINS = [
     BLIZZ
@@ -16,3 +16,10 @@ COMMANDS = [
     'db_len',
     'get_id'
 ]
+
+BTS = {
+    "INFO": "Mi informacion",
+    "REFERIDOS": "Referidos",
+    "REFERIR": "Referir",
+    "ACTIVATE": "Activarme"
+}

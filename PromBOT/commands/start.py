@@ -1,4 +1,4 @@
-from telegram import Update, ChatMemberBanned, ChatMemberLeft
+from telegram import Update, ChatMemberBanned, ChatMemberLeft, ReplyKeyboardMarkup
 from telegram.constants import ChatAction
 from telegram.ext import ContextTypes
 
@@ -65,11 +65,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 "mail": None,
                 "phone": None,
                 "referrer": referrer,
-                "referrals": []
+                "referrals": [],
+                "tokens": 0,
+                "rifa":{
+                    "invitados": [],
+                    "need_invited": 5,
+                    "rifas_w": 0
+                }
             }
         )
 
     commands = ""
     for i in consts.COMMANDS:
         commands += f"/{i}\n"
-    await context.bot.send_message(chat_id=id, text=f"I'm a bot, please talk to me!\nThere are my commands: \n{commands}")
+    btns = [[consts.BTS['INFO']], [consts.BTS['REFERIDOS'], consts.BTS['REFERIR']]]
+    await context.bot.send_message(chat_id=id, text=f"I'm a bot, please talk to me!\nThere are my commands: \n{commands}", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+    return 0
