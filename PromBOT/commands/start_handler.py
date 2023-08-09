@@ -7,7 +7,6 @@ from . import DB, start_handlers
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
-    line_btn = []
     if msg == BTS['INFO']:
         await start_handlers.get_info(update, context, DB)        
     elif msg == BTS['REFERIDOS']:

@@ -7,10 +7,11 @@ COPY . /app/
 SHELL [ "/bin/bash", "-c" ]
 
 ENV TOKEN "6592524009:AAFp6S6PwNUXePWHRK_luYCZJObWrHZfPWc"
+ENV MONGO_URI "mongodb+srv://blizzsoftword:eddyeddy@vendermejor.8r3dw9b.mongodb.net/?retryWrites=true&w=majority"
 
 RUN python3 -m venv /app
 RUN source /app/bin/activate
-# RUN pip install --upgrade pip
+RUN pip install --upgrade pip
 RUN pip install -r /app/requirements.txt
 
 CMD ["python3", "-m", "PromBOT"]
