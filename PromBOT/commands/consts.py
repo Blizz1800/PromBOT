@@ -19,7 +19,13 @@ COMMANDS = [
 
 BTS = {
     "INFO": "Mi informacion",
+    "FOLLOWERS": "Obtener Seguidores",
     "REFERIDOS": "Referidos",
-    "REFERIR": "Referir",
-    "ACTIVATE": "Activarme"
+    "MONEY": {
+        "WITHDRAW": "Extraer",
+        "EARN": "Ganar"
+    },
+    "INLINE": {
+        "ACTIVATE": "Activarme"
+    }
 }

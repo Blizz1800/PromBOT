@@ -11,8 +11,12 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start_handlers.get_info(update, context, DB)        
     elif msg == BTS['REFERIDOS']:
         await start_handlers.get_referidosV2(update, context, DB)
-    elif msg == BTS['REFERIR']:
-        await start_handlers.referir(update, context)
+    elif msg == BTS['FOLLOWERS']:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
+    elif msg == BTS['MONEY']['WITHDRAW']:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
+    elif msg == BTS['MONEY']['EARN']:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
     return 0
         
 async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):

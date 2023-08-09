@@ -1,17 +1,15 @@
 from telegram.constants import ChatAction
+from telegram import ReplyKeyboardMarkup
+from PromBOT.commands.consts import BTS
 
 async def get_referidos(update, context, DB):
-    me = DB['users'].find_one({'t_id': update.effective_chat.id})
-    if len(me['referrals']) != 0:
-        resp = "__Referidos__: "
-        for i in me['referrals']:
-            tmp = DB['users'].find_one({'t_id': i})
-            resp += f" * {tmp['name']}]\n"
-        resp += f"__Referidos__: {len(me['referrals'])}\n"
-        context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="MarkdownV2", text=resp)
-    else:
-        link = f"https://t.me/{bot.username}?start={update.effective_user.id}"
-        context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="MarkdownV2", text=f"**No tienes referidos!!**\nPor Favor, invita usuarios:\n{link}")
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    bts = [
+        [BTS['FOLLOWERS']],
+        [BTS['INFO'], BTS['REFERIDOS']],
+        [BTS['MONEY']['WITHRAW'], BTS['MONEY']['EARN']]
+    ]
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Encantado! Que clase de informacion necesita?", reply_markup=ReplyKeyboardMarkup(bts, resize_keyboard=True))
 
 async def get_referidosV2(update, context, DB):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)

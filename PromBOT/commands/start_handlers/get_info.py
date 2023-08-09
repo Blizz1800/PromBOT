@@ -10,7 +10,7 @@ async def get_info(update, context, DB):
         resp += "**Si**\n"
     else:
         resp += "**No**\n"
-        line_btn.append(InlineKeyboardButton(BTS['ACTIVATE']), callback_data=BTS['ACTIVATE'])   # Agregar un boton para entrar al grupo
+        line_btn.append(InlineKeyboardButton(BTS['INLINE']['ACTIVATE']), callback_data=BTS['INLINE']['ACTIVATE'])   # Agregar un boton para entrar al grupo
     resp += f"_Activo_: {me['active']}\n" 
     if me['mail']:
         resp += f"_Correo_: {me['mail']}\n"
