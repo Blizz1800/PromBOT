@@ -2,12 +2,18 @@ from telegram.ext import ContextTypes, ConversationHandler
 from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
 from .consts import BTS, TOKEN_NAME, get_msg
-from . import DB, cmd_handlers, code
-
+from . import DB, cmd_handlers, code, start
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
-    name = DB['users'].find_one({'t_id': update.effective_user.id})['name']
+
+    name = DB['users'].find_one({'t_id': update.effective_user.id})
+    if name is not None:
+        name = name['name']
+    else:
+        await start.start(update=update, context=context, start_msg=False)
+        name = DB['users'].find_one({'t_id': update.effective_user.id})['name']
+
     if msg == name:
         return await cmd_handlers.get_info(update, context) # 0
     elif msg == BTS['REFERIDOS']['KEY']:
