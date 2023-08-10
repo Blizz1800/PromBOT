@@ -20,8 +20,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             if referral is not None:
                 referir = True
                 for i in referral['referrals']:
-                    if i == referrer:
-                        await context.bot.send_message(chat_id=id, text=f"You have already referred to @{referrer}")
+                    if i == id:
+                        await context.bot.send_message(chat_id=id, text=f"You have already referred to this one")
                         referir = False
                         break
                 if referir:
@@ -29,8 +29,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                     if referral['user'] is None:
                         username = referral['user'] 
                     else:
-                        username = referral['name']
-
+                        username = referral['name']                    
+                    DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
                     await context.bot.send_message(referral['t_id'], text=f"Has referido a @{update.effective_user.username}")
                     await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_user.first_name}! you have invited by {referral['user']}")
             else:
@@ -39,15 +39,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             referral = DB['users'].find_one({"t_id": _self['referrer']})
             if _self['referrer'] is not None:
                 if referral['user'] is not None:
-                    context.bot.send_message(id, text=f"You have already referred to @{referral['user']}")
+                    await context.bot.send_message(id, text=f"You have already referred to {referral['user']}")
                 else:
-                    context.bot.send_message(id, text=f"You have already referred to {referral['name']} ({referral['t_id']})")
+                    await context.bot.send_message(id, text=f"You have already referred to {referral['name']} ({referral['t_id']})")
             else:
                 DB['users'].update_one({"t_id": id}, {"$set": {'referrer': referrer}})
                 DB['users'].update_one({"t_id": referrer}, {"$push": {'referrals': id}})
-                await context.bot.send_message(referral['t_id'], text=f"Has referido a @{update.effective_user.username}")
+                DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
+
+                await context.bot.send_message(referrer, text=f"Has referido a @{update.effective_user.username}\ntoken_b Now: *{referral['token_b']}*", parse_mode='MarkdownV2')
                 await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_user.first_name}! you have invited by {referral['user']}")
-                
+              
                 
 
     group_id = '@test_blizzbot_group'
@@ -66,7 +68,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 "phone": None,
                 "referrer": referrer,
                 "referrals": [],
-                "tokens": 0,
+                "token_b": 0,
                 "rifa":{
                     "invitados": [],
                     "need_invited": 5,
@@ -78,6 +80,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     commands = ""
     for i in consts.COMMANDS:
         commands += f"/{i}\n"
-    btns = [[consts.BTS['INFO']], [consts.BTS['REFERIDOS'], consts.BTS['REFERIR']]]
+    
+    btns = [[consts.BTS['FOLLOWERS']],
+        [name, consts.BTS['REFERIDOS']['KEY']],
+        [consts.BTS['MONEY']['GET'], consts.BTS['MONEY']['POST']]]
     await context.bot.send_message(chat_id=id, text=f"I'm a bot, please talk to me!\nThere are my commands: \n{commands}", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
     return 0
