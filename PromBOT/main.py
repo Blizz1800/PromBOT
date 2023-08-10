@@ -4,6 +4,7 @@ from telegram.ext.filters import TEXT, COMMAND
 from dotenv import load_dotenv
 from os import getenv
 
+from .db_init import db_init_update
 from .commands import consts, start, code, start_handler, im_user, db_len, referrers, money_handler 
 
 HANDLERS = [
