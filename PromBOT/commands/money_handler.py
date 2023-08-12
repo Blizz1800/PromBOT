@@ -29,8 +29,15 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         pass
 
 async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
-
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+    btn, user = tuple(query.data.split(':'))
+    if btn == BTS['INLINE']['ACCEPT']:
+        pass
+    elif btn == BTS['INLINE']['DENY']:
+        pass
+    
 async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns = []
     btns.append([BTS['NET']['YT']])
@@ -78,10 +85,9 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     elif wa_photo:
         if update.message.photo:
             for i in ADMINS:
-                await context.bot.send_photo(chat_id=i, photo=update.message.photo[-1], caption=f"El usuario {update.effective_chat.full_name}\({id}\), ha enviado esta prueba de su subscripcion", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(BTS['ACCEPT'], callback_data=BTS['ACCEPT']), InlineKeyboardButton(BTS['DENY'], callback_data=BTS['DENY'])]]))
+                await context.bot.send_photo(chat_id=i, parse_mode="MarkdownV2", photo=update.message.photo[-1], caption=f"El usuario {update.effective_chat.full_name}\({id}\), ha enviado esta prueba de su subscripcion", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(BTS['INLINE']['ACCEPT'], callback_data=f"{BTS['INLINE']['ACCEPT']}:{id}"), InlineKeyboardButton(BTS['INLINE']['DENY'], callback_data=f"{BTS['INLINE']['DENY']}:{id}")]]))
             await context.bot.send_message(chat_id=id, parse_mode="MarkdownV2", text="Por favor, espere que le avisemos si su imagen cumple los requisitos", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
         else:
-            print(3)
             await context.bot.send_message(chat_id=id, text="No photo in message", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
         
         wa_photo = False

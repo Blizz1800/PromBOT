@@ -18,8 +18,7 @@ COMMANDS = [
 
 
 BTS = {
-    "ACCEPT": "Aceptar",
-    "DENY": "Banear",
+    
     "FOLLOWERS": "Obtener Seguidores",
     "BACK": "Volver",
     "REFERIDOS": {
@@ -35,7 +34,9 @@ BTS = {
     "INLINE": {
         "ACTIVATE": "Activarme",
         "SUB": "Subscripciones",
-        "CODE": "Insertar Codigo"
+        "CODE": "Insertar Codigo",
+        "ACCEPT": "Aceptar",
+        "DENY": "Banear",
     },
     "NET": {
         "IG": "Instagram",

@@ -31,6 +31,8 @@ HANDLERS = [
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['ACTIVATE']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['SUB']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['CODE']),
+    CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['ACCEPT']),
+    CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['DENY']),
     CommandHandler('im_user', im_user.im_user),
     CommandHandler('db_len', db_len.db_len),
     
