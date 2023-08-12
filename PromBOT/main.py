@@ -1,5 +1,5 @@
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
-from telegram.ext.filters import TEXT, COMMAND
+from telegram.ext.filters import TEXT, COMMAND, PHOTO
 
 from dotenv import load_dotenv
 from os import getenv
@@ -22,7 +22,7 @@ HANDLERS = [
         states={
             0: [MessageHandler(TEXT & (~COMMAND), start_handler.start_handler)],
             1: [MessageHandler(TEXT & (~COMMAND), referrers.refferers_handler)],
-            2: [MessageHandler(TEXT & (~COMMAND), money_handler.money_handler)],
+            2: [MessageHandler((TEXT | PHOTO) & (~COMMAND), money_handler.money_handler)],
         },
         fallbacks=[
             code

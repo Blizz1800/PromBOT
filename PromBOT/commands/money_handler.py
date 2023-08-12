@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from . import DB
 from .consts import BTS, get_msg, ADMINS, TOKEN_NAME
@@ -17,16 +17,25 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         text = base['INST']['SUB']
         wa_photo = True
         wa_code = False
-    if data == BTS['INLINE']['CODE']:
+        print(f"{BTS['INLINE']['SUB']} selected")
+    elif data == BTS['INLINE']['CODE']:
         text = base['INST']['CODE']
         wa_photo = False
         wa_code = True
+        print(f"{BTS['INLINE']['CODE']} selected")
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
-    finally:
+    except:
         pass
 
+async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    pass
+
 async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    btns = []
+    btns.append([BTS['NET']['YT']])
+    btns.append([BTS['NET']['IG']])
+    btns.append([BTS['BACK']])
     global wa_code, wa_photo
     id = update.effective_chat.id
     msg = update.message.text
@@ -57,10 +66,7 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
                     array_filters=[{"i": {"$eq": msg}}])
     
                 msg = get_msg('NO_CODE')['MSG']
-                btns = []
-                btns.append([BTS['NET']['YT']])
-                btns.append([BTS['NET']['IG']])
-                btns.append([BTS['BACK']])
+                
                 await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*\+1 {TOKEN_NAME[0]}*", parse_mode="MarkdownV2", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
                 wa_code = False
             else:
@@ -69,9 +75,15 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         else:
             await context.bot.send_message(chat_id=id, text="Ese codigo no existe!")
             await context.bot.send_message(chat_id=id, text=invalid['MSG'], reply_markup=invalid['BTN'], parse_mode=invalid['MARKDOWN'])
-
-    elif wa_photo and update.message.photo:
+    elif wa_photo:
+        if update.message.photo:
+            for i in ADMINS:
+                await context.bot.send_photo(chat_id=i, photo=update.message.photo[-1], caption=f"El usuario {update.effective_chat.full_name}\({id}\), ha enviado esta prueba de su subscripcion", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(BTS['ACCEPT'], callback_data=BTS['ACCEPT']), InlineKeyboardButton(BTS['DENY'], callback_data=BTS['DENY'])]]))
+            await context.bot.send_message(chat_id=id, parse_mode="MarkdownV2", text="Por favor, espere que le avisemos si su imagen cumple los requisitos", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+        else:
+            print(3)
+            await context.bot.send_message(chat_id=id, text="No photo in message", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+        
         wa_photo = False
-        for i in ADMINS:
-            await context.bot.send_photo(chat_id=i, photo=update.message.photo, caption=f"El usuario {update.effective_chat.full_name}\({id}\), ha enviado esta prueba de su subscripcion")
+
     return 2

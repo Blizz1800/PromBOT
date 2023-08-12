@@ -18,6 +18,8 @@ COMMANDS = [
 
 
 BTS = {
+    "ACCEPT": "Aceptar",
+    "DENY": "Banear",
     "FOLLOWERS": "Obtener Seguidores",
     "BACK": "Volver",
     "REFERIDOS": {
