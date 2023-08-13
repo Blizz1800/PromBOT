@@ -56,6 +56,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
     group_id = '@test_blizzbot_group'
     user_in_chat = await context.bot.get_chat_member(group_id, id)
 
+    codes = DB['codes'].find({})
+    code_l = []
+    if codes is not None:
+        for c in codes:
+            code_l.append(c['code'])
+
     users_t = DB['users']
     if (users_t.find_one({"t_id": id}) is None):
         users_t.insert_one(
@@ -71,6 +77,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                 "referrals": [],
                 "token_b": 0,
                 "banned": False,
+                "codes": code_l,
                 "rifa":{
                     "invitados": [],
                     "need_invited": 5,

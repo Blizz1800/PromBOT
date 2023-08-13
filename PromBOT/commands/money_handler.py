@@ -17,12 +17,10 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         text = base['INST']['SUB']
         wa_photo = True
         wa_code = False
-        print(f"{BTS['INLINE']['SUB']} selected")
     elif data == BTS['INLINE']['CODE']:
         text = base['INST']['CODE']
         wa_photo = False
         wa_code = True
-        print(f"{BTS['INLINE']['CODE']} selected")
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except:
@@ -46,6 +44,12 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     global wa_code, wa_photo
     id = update.effective_chat.id
     msg = update.message.text
+    DB['users'].update_many(
+        {},
+        {"$pull":{
+            "codes": None
+        }}
+    )
     if not wa_code and not wa_photo:
         if msg == BTS['NET']['IG']:
             await context.bot.send_message(chat_id=id, text="Under Construction")
@@ -63,6 +67,8 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             btns.append([BTS['NET']['YT']])
             btns.append([BTS['NET']['IG']])
             btns.append([BTS['BACK']])
+            wa_code = False
+
             await context.bot.send_message(chat_id=id, text=msg, reply_markup=ReplyKeyboardMarkup(keyboard=btns, resize_keyboard=True))
             return 2
         if DB['codes'].find_one({'code': msg}):

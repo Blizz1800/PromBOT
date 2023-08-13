@@ -23,7 +23,7 @@ async def get_info(update, context):
     if me['referrer']:
         tmp = DB['users'].find_one({'t_id': me['referrer']})
         resp += f"_Anfitrion_: [{tmp['name']}]\(tg://user?id\={me['referrer']}\)\n"
-    tk = me['token_b']
+    tk = me['token_a']
     if tk > 1:
         resp += f"_{TOKEN_NAME[1]}_: `{tk}`\n"
     else:
