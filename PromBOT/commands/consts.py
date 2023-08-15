@@ -6,6 +6,9 @@ JR      = 1498420293
 
 TOKEN_NAME = ["A", "B"]
 
+GROUP_ID = '@test_blizzbot_group'
+
+
 ADMINS = [
     BLIZZ,
     YUNIOR,
@@ -16,9 +19,12 @@ COMMANDS = [
     'start'
 ]
 
+CANTIDAD_EXTRAER = "De acuerdo, diga su cantidad de *{TK}* a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\nMinimo a extraer: 10{TK}"
 
 BTS = {
-    
+    "YES": "Si, es esta!",
+    "NO": "No, no lo es",
+    "INVITE": "Invitar a...",
     "FOLLOWERS": "Obtener Seguidores",
     "BACK": "Volver",
     "REFERIDOS": {
@@ -42,6 +48,7 @@ BTS = {
         "IG": "Instagram",
         "YT": "YouTube"
     },
+    "RIFAS": "Participar en Rifa!!",
     "NO_CODE": "No Tengo un Codigo :("
 }
 
@@ -80,7 +87,7 @@ def get_msg(key, *args, **kargs):
                 [BTS['FOLLOWERS']],
                 [kargs['user'], BTS['REFERIDOS']['KEY']],
                 [BTS['MONEY']['GET'], BTS['MONEY']['POST']],
-                
+                [BTS['RIFAS']]
             ]
             return {
                 "MARKDOWN": mk,

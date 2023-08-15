@@ -5,6 +5,7 @@ from telegram.ext import ContextTypes
 from . import DB, consts
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=True) -> None:
+
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
     id = update.effective_chat.id
     name = update.effective_chat.full_name
@@ -48,7 +49,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                 #     DB['users'].update_one({"t_id": referrer}, {"$push": {'referrals': id}})
                 #     DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
 
-                #     await context.bot.send_message(referrer, text=f"Has referido a @{update.effective_user.username}\ntoken_b Now: *{referral['token_b']}*", parse_mode='MarkdownV2')
+                #     await context.bot.send_message(referrer, text=f"Has referido a @{update.effective_user.username}\ntoken_b Now: *{referral['token_b']}*", parse_mode='Markdown')
                 #     await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_user.first_name}! you have invited by {referral['user']}")
               
                 
@@ -75,9 +76,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                 "phone": None,
                 "referrer": referrer,
                 "referrals": [],
+                "token_a": 0,
                 "token_b": 0,
                 "banned": False,
                 "codes": code_l,
+                "target": None,
                 "rifa":{
                     "invitados": [],
                     "need_invited": 5,

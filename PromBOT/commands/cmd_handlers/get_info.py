@@ -7,6 +7,7 @@ async def get_info(update, context):
     me = DB['users'].find_one({'t_id': update.effective_chat.id})
     resp = f"*{me['name']}*\n\n_En el grupo_: "
     line_btn = [[]]
+    
     if me['inGroup']:
         resp += "*Si*\n"
     else:
@@ -22,15 +23,24 @@ async def get_info(update, context):
         resp += f"_Telefono_: {me['phone']}\n"
     if me['referrer']:
         tmp = DB['users'].find_one({'t_id': me['referrer']})
-        resp += f"_Anfitrion_: [{tmp['name']}]\(tg://user?id\={me['referrer']}\)\n"
-    tk = me['token_a']
-    if tk > 1:
-        resp += f"_{TOKEN_NAME[1]}_: `{tk}`\n"
-    else:
-        resp += f"_{TOKEN_NAME[0]}_: `{tk}`\n"
+        resp += f"_Anfitrion_: [{tmp['name']}]tg://user?id={me['referrer']})\n"
+
+    if me['token_a'] >= 17:
+        DB['users'].update_one({"t_id": me['t_id']}, {
+            "$dec": {
+                "token_a": 17
+            },
+            "$inc": {
+                "token_b": 1
+            }
+        })
+
+    resp += f"_{TOKEN_NAME[0]}_: `{me['token_a']}`\n"
+    resp += f"_{TOKEN_NAME[1]}_: `{me['token_b']}`\n"
+    
     
     if len(line_btn) > 0:
-        await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="MarkdownV2", text=resp, reply_markup=InlineKeyboardMarkup(line_btn))
+        await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="Markdown", text=resp, reply_markup=InlineKeyboardMarkup(line_btn))
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="MarkdownV2", text=resp)
+        await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="Markdown", text=resp)
     return 0

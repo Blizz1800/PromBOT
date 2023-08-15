@@ -21,11 +21,11 @@ async def get_referidosV2(update, context):
         R = DB['users'].find_one({'t_id': i})
         string = f"[`{R['t_id']}`] {R['name']}"
         if R['user'] is not None:
-            string += f" \({R['user']}\)"
+            string += f" {R['user']})"
         result.append(string)
     if len(result) == 0:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No se han referido a ningún usuario.")
     else:
         refs = "\n".join(result)
         resp = f"Usted a referido a:\n\n{refs}"
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=resp, parse_mode="MarkdownV2")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=resp, parse_mode="Markdown")

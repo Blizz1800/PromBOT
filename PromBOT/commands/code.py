@@ -34,10 +34,10 @@ async def gen_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                 code = f"{code[:c_len]}{code[c_len*-1:]}"
                 DB['codes'].insert_one({'code': code})
                 DB['users'].update_many({}, {'$push': {'codes': code}})
-                msg += f"\.    `{code}`\n" 
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='MarkdownV2')
+                msg += f"    `{code}`\n" 
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='Markdown')
         except Exception as e:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Error: `{e}`, re\-enter number\.\.\. or type /cancel', parse_mode='MarkdownV2')
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Error: `{e}`, reenter number or type /cancel', parse_mode='Markdown')
         return -1
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Usted no es un administrador, por favor no lo intente de nuevo")
