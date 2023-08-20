@@ -8,6 +8,7 @@ TOKEN_NAME = ["A", "B"]
 
 GROUP_ID = '@test_blizzbot_group'
 
+MARKDOWN = "Markdown"
 
 ADMINS = [
     BLIZZ,
@@ -41,63 +42,116 @@ BTS = {
         "ACTIVATE": "Activarme",
         "SUB": "Subscripciones",
         "CODE": "Insertar Codigo",
+        "COMENT": "Comentarios",
         "ACCEPT": "Aceptar",
         "DENY": "Banear",
+        "FOLLOW": "Siguiendo",
+        "REELS": "Ver Reels",
+        "PAGO": "Avisar de pago",
+        "MORE": "🥲Mostrar mas💸"
     },
     "NET": {
         "IG": "Instagram",
         "YT": "YouTube"
     },
-    "RIFAS": "Participar en Rifa!!",
-    "NO_CODE": "No Tengo un Codigo :("
+    "RIFAS": {
+        "KEY": "Rifas",
+        "GET": "Obtener Informacion",
+        "POST": "Participar en Rifa"
+    },
+    "NO_CODE": "No Tengo un Codigo :(",
+    "CANCEL": "Cancelar"
+}
+
+BTNS = {
+    "START": [
+            [BTS['FOLLOWERS']],
+            ["{user}", BTS['REFERIDOS']['KEY']],
+            [BTS['MONEY']['GET'], BTS['MONEY']['POST']],
+            [BTS['RIFAS']['KEY']]
+        ],
+    "RIFA": [
+        [BTS['RIFAS']['GET'], BTS['RIFAS']['POST']],
+        [BTS['BACK']]
+    ]
+    
 }
 
 MESSAGES = {
     "START": {
         "MARKDOWN": None,
-        "MSG": "Bienvenido a {user}!\nElija una opcion:",
+        "MSG": [
+            "Bienvenido {user}!\nQue desea?",
+            "Bienvenido de vuelta, {user}!\nQue desea?",
+            "No se reconoce su entrada"
+        ],
+        "BTN": BTNS['START']
     },
     "YT": {
         "MARKDOWN": None,
-        "MSG": "Mensaje que despues @JRMast me debe dar",
+        "MSG": ["Mensaje que despues @JRMast me debe dar"],
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['SUB'], callback_data=BTS['INLINE']['SUB']),InlineKeyboardButton(text=BTS['INLINE']['CODE'], callback_data=BTS['INLINE']['CODE'])]]),
         "INST": {
             "SUB": "Mensaje de instrucciones para cuando se quiera ganar con subs",
             "CODE": "Mensaje de instrucciones para cuando se quiera ganar con codigos"
         }
     },
+    "IG": {
+        "MARKDOWN": None,
+        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['FOLLOW'], callback_data=BTS['INLINE']['FOLLOW']),InlineKeyboardButton(text=BTS['INLINE']['REELS'], callback_data=BTS['INLINE']['REELS'])], [InlineKeyboardButton(BTS['INLINE']['COMENT'], callback_data=BTS['INLINE']['COMENT'])]]),
+        "INST": {
+            "FOLLOW": "Mensaje de instrucciones para cuando se quiera ganar con seguimiento",
+            "REELS": "Mensaje de instrucciones para cuando se quiera ganar viendo reels",
+            "COMENT": "Mensaje de instrucciones para cuando se quiera ganar con comentarios"
+        }
+    },
     "INVALID_CODE": {
         "MARKDOWN": None,
-        "MSG": "Por favor introduzca un codigo valido!",
+        "MSG": ["Por favor introduzca un codigo valido!"],
         "BTN": ReplyKeyboardMarkup([[BTS['NO_CODE']]], resize_keyboard=True)
     },
     "NO_CODE": {
         "MARKDOWN": None,
-        "MSG": "De acuerdo, desea hacer algo mas?",
+        "MSG": ["De acuerdo, desea hacer algo mas?"],
+        "BTN": None
+    },
+    "RIFAS": {
+        "MARKDOWN": None,
+        "MSG": ["Veo q estas interesado en las rifas, que bien!!"],
+        "BTN": ReplyKeyboardMarkup(BTNS['RIFA'], resize_keyboard=True)
     }
 }
 
 def get_msg(key, *args, **kargs):
-    
+    v = 0
+    if ':' in key:
+        key, v = tuple(key.split(':'))
+    try:
+        v = int(v) -1 
+    except ValueError:
+        v = 0
     if key == 'START':
-        if kargs['user'] is not None:
+        if kargs['user'] is not None or long(args) > 0 and args[0] is not None:
             mk = MESSAGES[key]['MARKDOWN']
-            msg = MESSAGES[key]['MSG'].format(user=kargs['user'])
-            btns = [
-                [BTS['FOLLOWERS']],
-                [kargs['user'], BTS['REFERIDOS']['KEY']],
-                [BTS['MONEY']['GET'], BTS['MONEY']['POST']],
-                [BTS['RIFAS']]
-            ]
+            msg = MESSAGES[key]['MSG'][v].format(user=kargs['user'])
+            btns = MESSAGES[key]['BTN']
+            for i, v in enumerate(btns):
+                for i2, j in enumerate(v):
+                    btns[i][i2] = j.format(user=kargs['user'])
             return {
                 "MARKDOWN": mk,
                 "MSG": msg,
-                "BTN": ReplyKeyboardMarkup(btns, resize_keyboard=True)
+                "BTN": ReplyKeyboardMarkup(btns)
             }
         else:
             raise Exception("No se ha seleccionado un usuario")
     else:
-        return MESSAGES[key]
+        return {
+            "MARKDOWN": MESSAGES[key]['MARKDOWN'],
+            "MSG": MESSAGES[key]['MSG'][v],
+            "BTN": MESSAGES[key]['BTN']
+        }
     
 
     

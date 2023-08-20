@@ -1,8 +1,9 @@
 from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
-from . import DB
+from . import DB, validate, control
 from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER
 from .cmd_handlers import net, money
+import time
 
 from pprint import pprint
 
@@ -11,18 +12,75 @@ from bson.objectid import ObjectId
 wa_code = False      # WAnna CODE
 wa_photo = False     # WAnna Photo
 
+async def envio(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo
+    if not photo and len(photo) <= 0:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="No se ha detectado una foto, por favor, reenviela")
+        return 1
+
+    db_id = context.user_data['db_id']
+    DB['pagos'].update_one({"_id": ObjectId(db_id)},
+        {
+            "$set": {
+                'pagado': True,
+                'prueba': photo[-1].file_unique_id
+            }
+        }
+    )
+    DB['users'].update_one({'t_id': context.user_data['u_id']}, {'$inc': {'token_b': -context.user_data['pago']}})
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Se esta enviando al usuario su aviso de pago, por favor esperar")
+    await context.bot.send_photo(chat_id=context.user_data['u_id'], photo=photo[-1], caption="Su pago ha sido enviado a su destino, por favor espere paciente a recibirlo")
+    return -1
+        
+async def aviso_pago(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+    context.user_data['db_id'] = data.split(':')[1]
+    pago = DB['pagos'].find_one({"_id": ObjectId(context.user_data['db_id'])})
+    context.user_data['pago'] = pago['amount']
+    context.user_data['u_id'] = pago['t_id']
+    if pago['pagado']:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Ya ha sido pagado")
+        return -1
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Por favor, envia una prueba el usuario de su pago")
+    return 1
+
 async def extract(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
     id = update.effective_chat.id
     me = DB['users'].find_one({'t_id': id})
     p = get_msg('START', user=update.effective_user.full_name)
 
+    target = me['target']
+    obj = ''
+    t = validate(target)
+    if t >= 0:
+        if t == 0:
+            obj = 'tarjeta'
+        else:
+            obj = "celular"
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="`{}` no es una direccion valida, por favor, introduzca una direccion a la q podamos enviar su dinero (Numero de telefono o Tarjeta de Banco)".format(target), reply_markup=ReplyKeyboardMarkup([[BTS['CANCEL']]], True), parse_mode='Markdown')
+        return 2
     try:
         amount = int(msg)
         if (me['token_b'] - amount) >= 10:
-            DB['users'].update_one({'t_id': id}, {'$inc': {'token_b': -amount}})
+            # DB['users'].update_one({'t_id': id}, {'$inc': {'token_b': -amount}})
+            
+           
+            id_db= DB['pagos'].insert_one({
+                "t_id": id,
+                "time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+                "amount": amount,
+                "prueba": None,
+                "pagado": False
+            }).inserted_id
+            btn = InlineKeyboardMarkup([
+                [InlineKeyboardButton(BTS['INLINE']['PAGO'], callback_data=f"{BTS['INLINE']['PAGO']}:{id_db}")]
+            ])
             for i in ADMINS:
-                await context.bot.send_message(chat_id=i, parse_mode="Markdown", text=f"⚠️🫣*Houston, tenemos un problema*😬⚠️\n\nEl usuario {me['name']}({me['t_id']}), ha solicitado de {amount}{TOKEN_NAME[1]} su pago hacia {me['target']}!!😱😡")
+                await context.bot.send_message(chat_id=i, reply_markup=btn, parse_mode="Markdown", text=f"⚠️🫣*Houston, tenemos un problema*😬⚠️\n\nEl usuario {me['name']}({me['t_id']}), ha solicitado de {amount}{TOKEN_NAME[1]} su pago hacia su {obj} `{target}`!!😱😡")
             await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=f'🥺Su solicitud esta siendo procesada por los 🤵🏻‍♂️admin, por favor espere...👨🏻‍💻')
         else:
             await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=f'Debe tener al menos 10 {TOKEN_NAME[1]} para efectuar el pago, y su valor neto debe ser mayor a 10 {TOKEN_NAME[1]}.\n\nEsto significa que usted debera dejar en su cuenta al menos 10 {TOKEN_NAME[1]} para efectuar el pago. Si su cantidad de {TOKEN_NAME[1]} es menor que 10, o su solicitud de pago llega a ser menor que 10 {TOKEN_NAME[1]}, no se llevara a cabo')
@@ -50,18 +108,26 @@ async def target_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global wa_code, wa_photo
+    wa_photo = False
+    wa_code = False
     query = update.callback_query
     data = query.data
     await query.answer()
-    base = get_msg('YT')
+    base = get_msg(context.user_data['NET'])    # Selecciona Youtube o Instagram automaticamente
+    #   YOUTUBE
     if data == BTS['INLINE']['SUB']:
         text = base['INST']['SUB']
         wa_photo = True
-        wa_code = False
     elif data == BTS['INLINE']['CODE']:
         text = base['INST']['CODE']
-        wa_photo = False
         wa_code = True
+    #   INSTAGRAM
+    elif data == BTS['INLINE']['COMENT']:
+        text = base['INST']['COMENT']
+    elif data == BTS['INLINE']['FOLLOW']:
+        text = base['INST']['FOLLOW']
+    elif data == BTS['INLINE']['REELS']:
+        text = base['INST']['REELS']
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except:
@@ -123,6 +189,8 @@ async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return 0
     elif msg == BTS['NO']:
         await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=f"Introduzca el destino donde desea recibir su dinero.")
+    elif msg == BTS['CANCEL']:
+        return await control('START:2', update, context, -1)
     else:
         money.update_target(update.effective_user.id, msg)
         await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=yes_no_kb, text=f'Es esta su nueva direccion de destino para recibir sus pagos?\n\n{msg}')
@@ -144,8 +212,10 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     )
     if not wa_code and not wa_photo:
         if msg == BTS['NET']['IG']:
-            await context.bot.send_message(chat_id=id, text="Under Construction")
+            context.user_data['NET'] = 'IG'
+            await net.ig(update, context)
         elif msg == BTS['NET']['YT']:
+            context.user_data['NET'] = 'YT'
             await net.yt(update, context)
         elif msg == BTS['BACK']:
             p = get_msg('START', user=update.effective_user.full_name)

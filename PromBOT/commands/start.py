@@ -14,7 +14,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
     referrer = None     # Referidor [REFERIDO PADRE!!]
     _self = DB['users'].find_one({"t_id": id})
     if context.args is not None:
-        if len(context.args) != 0:
+        if long(context.args) != 0:
             referrer = int(context.args[0])     # Vemos quien esta refiriendo
             if _self is None:   # Si aun no existimos en la DB
                 referral = DB['users'].find_one({"t_id": referrer})

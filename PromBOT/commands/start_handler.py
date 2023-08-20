@@ -2,7 +2,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from telegram import ChatInviteLink, Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ChatMemberLeft, ChatMemberBanned
 
 from .consts import BTS, TOKEN_NAME, get_msg
-from . import DB, cmd_handlers, code, start
+from . import DB, cmd_handlers, code, start, control
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
@@ -33,12 +33,10 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await cmd_handlers.money.extraer(update=update, context=context) # 4 
     elif msg == BTS['MONEY']['POST']:
         return await cmd_handlers.money.ganar(update=update, context=context) # 2
-    elif msg == BTS['RIFAS']:
-        # return await cmd_handlers.money.ganar(update=update, context=context) # 3
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
+    elif msg == BTS['RIFAS']['KEY']:
+        return await control('RIFAS', update, context, 5)
     else:
-        p = get_msg('START', user=update.effective_user.full_name)
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="No se reconoce su entrada", reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
+        await control('START:3', update, context) 
     return 0
         
 async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
