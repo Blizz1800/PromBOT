@@ -23,7 +23,7 @@ async def get_referidosV2(update, context):
         if R['user'] is not None:
             string += f" {R['user']})"
         result.append(string)
-    if long(result) == 0:
+    if len(result) == 0:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No se han referido a ningún usuario.")
     else:
         refs = "\n".join(result)

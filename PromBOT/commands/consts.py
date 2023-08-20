@@ -132,7 +132,7 @@ def get_msg(key, *args, **kargs):
     except ValueError:
         v = 0
     if key == 'START':
-        if kargs['user'] is not None or long(args) > 0 and args[0] is not None:
+        if kargs['user'] is not None or len(args) > 0 and args[0] is not None:
             mk = MESSAGES[key]['MARKDOWN']
             msg = MESSAGES[key]['MSG'][v].format(user=kargs['user'])
             btns = MESSAGES[key]['BTN']
