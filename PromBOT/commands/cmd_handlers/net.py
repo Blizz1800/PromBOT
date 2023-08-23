@@ -18,6 +18,7 @@ async def ig(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     
     msg = consts.get_msg('IG')
+    # print(msg)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=msg['MSG'],

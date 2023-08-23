@@ -12,11 +12,11 @@ async def get_info(update, context):
         resp += "*Si*\n"
     else:
         resp += "*No*\n"
-        line_btn[0].append(InlineKeyboardButton(BTS['INLINE']['ACTIVATE'], callback_data=BTS['INLINE']['ACTIVATE']))   # Agregar un boton para entrar al grupo
     if me['active']:
         resp += "_Activo_: *Si*\n" 
     else:
         resp += "_Activo_: *No*\n" 
+        line_btn[0].append(InlineKeyboardButton(BTS['INLINE']['ACTIVATE'], callback_data=BTS['INLINE']['ACTIVATE']))   # Agregar un boton para entrar al grupo
     if me['mail']:
         resp += f"_Correo_: {me['mail']}\n"
     if me['phone']:

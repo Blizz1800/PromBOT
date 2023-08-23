@@ -1,15 +1,17 @@
 from telegram import Update, constants, Bot, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from . import DB, control
+from . import DB, control, analytics
 from .consts import BTS, get_msg, MARKDOWN, ADMINS
 
 async def base_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message.text
 
     if msg == BTS['RIFAS']['GET']:
+        analytics.button_press(BTS['RIFAS']['GET'], update.effective_user.id)
         await get_info(update, context)
     elif msg == BTS['RIFAS']['POST']:
+        analytics.button_press(BTS['RIFAS']['POST'], update.effective_user.id)
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
     elif msg == BTS['BACK']:
         return control('START', update, context, -1)

@@ -1,6 +1,6 @@
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, ChatJoinRequestHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, ChatMemberHandler
 from telegram.ext.filters import TEXT, COMMAND, PHOTO, StatusUpdate
-
+from telegram import Update
 from dotenv import load_dotenv
 from os import getenv
 
@@ -54,6 +54,13 @@ entry = ConversationHandler(
     )
 
 HANDLERS = [
+    ConversationHandler(
+        entry_points=[CallbackQueryHandler(money_handler.ig_comments, pattern=consts.BTS['INLINE']['COMENT'])],
+        states={
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.ig_get_photo), CommandHandler('end', money_handler.ig_end)]
+        },
+        fallbacks=[]
+    ),
     code,
     get_pay,
     entry,
@@ -65,16 +72,19 @@ HANDLERS = [
         fallbacks=[],
         per_user=True
     ),
-    MessageHandler(StatusUpdate.NEW_CHAT_MEMBERS, chat_join.new_member),
+    # MessageHandler(StatusUpdate.NEW_CHAT_MEMBERS, chat_join.new_member),
+    ChatMemberHandler(callback=chat_join.new_member, chat_member_types=ChatMemberHandler.CHAT_MEMBER),
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['ACTIVATE']),
+    CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['UPDATE']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['SUB']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['CODE']),
-    CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['COMENT']),
+    
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['REELS']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['FOLLOW']),
+    CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['ACCEPT']}2"),
+    CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['DENY']}2"),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['ACCEPT']),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['DENY']),
-    CallbackQueryHandler(start_handler.share_handler, pattern=consts.BTS['INVITE']),
     CallbackQueryHandler(pagos.get_more, pattern=consts.BTS['INLINE']['MORE']),
     CommandHandler('im_user', im_user.im_user),
     CommandHandler('db_len', db_len.db_len),
@@ -88,7 +98,7 @@ def main():
     app.add_handlers(HANDLERS)
     db_init_update()
     print('Bot Running!')
-    app.run_polling()
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
     
 
 

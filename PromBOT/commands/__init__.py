@@ -9,6 +9,9 @@ load_dotenv()
 
 DB = MongoClient(getenv("MONGO_URI"))['vendermejor']
 
+def get_db(db:str = "vendermejor"):
+    return MongoClient(getenv("MONGO_URI"))[db]
+
 async def control(key, update, context, ret=0):
     m = get_msg(key, user=update.effective_chat.full_name)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'], parse_mode=m['MARKDOWN'], reply_markup=m['BTN'])

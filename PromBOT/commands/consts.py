@@ -48,7 +48,9 @@ BTS = {
         "FOLLOW": "Siguiendo",
         "REELS": "Ver Reels",
         "PAGO": "Avisar de pago",
-        "MORE": "🥲Mostrar mas💸"
+        "MORE": "🥲Mostrar mas💸",
+        "UPDATE": "Actualizar informacion",
+
     },
     "NET": {
         "IG": "Instagram",
@@ -103,7 +105,7 @@ MESSAGES = {
         "INST": {
             "FOLLOW": "Mensaje de instrucciones para cuando se quiera ganar con seguimiento",
             "REELS": "Mensaje de instrucciones para cuando se quiera ganar viendo reels",
-            "COMENT": "Mensaje de instrucciones para cuando se quiera ganar con comentarios"
+            "COMENT": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
         }
     },
     "INVALID_CODE": {
@@ -147,11 +149,14 @@ def get_msg(key, *args, **kargs):
         else:
             raise Exception("No se ha seleccionado un usuario")
     else:
-        return {
-            "MARKDOWN": MESSAGES[key]['MARKDOWN'],
-            "MSG": MESSAGES[key]['MSG'][v],
-            "BTN": MESSAGES[key]['BTN']
-        }
+        result = { }
+        msg = MESSAGES[key]
+        for k in msg.keys():
+            if k == 'MSG':
+                result[k] = msg[k][v]
+                continue
+            result[k] = msg[k]
+        return result
     
 
     
