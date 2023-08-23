@@ -3,6 +3,7 @@
 	[-] -> En desarrollo o Funcionando a Medias
 	[ ] -> Aun sin implementar
 	[*] -> Iniciado pero en continuacion por problemas tecnicos
+	[U] -> Terminado, sin implementar
 	[T] -> Terminado, falta testing
 
 # Caracteristicas:
@@ -15,7 +16,8 @@
 	[x] generador de codigos
 	[x] base de datos
 	[x] obtencion de monedas mediante verificacion humana de si el usuario esta o no suscrito a un canal
-	[-] Verificacion del usuario activo
+	[X] Bienvendia al grupo y despedidas
+	[T] Verificacion del usuario activo
 	[-] Sistema de rifas
 	[x] Sistema de pagos mediante interaccion humana
 	[x] Validacion de objetivo para el recivo de pagos, actualmente solo valida 
@@ -25,9 +27,10 @@
 	[x] Obtencion de pagos pendientes mediante un comando
 	[x] Formula para la variacion de los valores de extraccion minimos
 		-> int(x + y + 5)
-	[T] Sistema de estadisticas del pulsado de botones
-	[T] Sistema de estadsticas de ganancia de tokens
-	[T] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie grupo_media
+	[x] Sistema de estadisticas del pulsado de botones
+	[U] Sistema de estadsticas de ganancia de tokens
+	[x] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie 
+	[ ] ↑↑↑ Solicitud de explicacion de la denegacion de foto ↑↑↑
 	[ ] Sistema de venta basado en tokens
 	[ ] Venta de servicios de obtencion de subs para sus redes
 	[x] Ganancias de token x referido
