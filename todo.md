@@ -27,7 +27,7 @@
 		-> int(x + y + 5)
 	[T] Sistema de estadisticas del pulsado de botones
 	[T] Sistema de estadsticas de ganancia de tokens
-	[ ] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie grupo_media
+	[-] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie grupo_media
 	[ ] Sistema de venta basado en tokens
 	[ ] Venta de servicios de obtencion de subs para sus redes
 	[x] Ganancias de token x referido
