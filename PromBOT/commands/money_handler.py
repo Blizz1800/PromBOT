@@ -234,15 +234,23 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             admin = admin['name']
         await query.edit_message_caption(f"Esta prueba prueba ya fue requisada por {admin}")
         return 
-
+    is_accept = False
     if btn == f"{BTS['INLINE']['ACCEPT']}2":
+        is_accept = True
         status = 1
         inc = 1
-        ban = False
+        # ban = False
     elif btn == f"{BTS['INLINE']['DENY']}2":
+        u = DB['users'].find_one({"t_id": user})
+        if u['warns'] >= 3:
+            warn = 0
+            inc = -2
+        else:
+            warn = 1
+            inc = 0
+
         status = -1
-        ban = True
-        inc = 0
+        # ban = True
 
     DB['requests'].update_one(
         {
@@ -253,9 +261,9 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 "admin": update.effective_chat.id
             }
         }
-    )        
+    )
 
-    DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc}, "$set":{"banned": ban}})
+    DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc, "warns": warn}})
     if status > 0:
         stat = "aceptado"
         rec = f". Ha recibido *+{inc} {TOKEN_NAME[1]}*"
@@ -264,7 +272,9 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         rec = "."
     await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
     await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{rec}")
-
+    if not is_accept:
+        await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal")
+    # return -1
 
 
 async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

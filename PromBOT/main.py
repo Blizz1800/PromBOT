@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 from os import getenv
 
 from .db_init import db_init_update
-from .commands import consts, start, pagos, code, start_handler, im_user, db_len, referrers, money_handler, cmd_handlers, chat_join, rifa
+from .commands import consts, start, pagos, reglas, code, start_handler, im_user, db_len, referrers, money_handler, cmd_handlers, chat_join, rifa
 
+rules = CommandHandler('rules', reglas.get)
 get_pay = CommandHandler('get_pays', pagos.get_pays)
 code = ConversationHandler(
     per_user=True,
@@ -49,7 +50,8 @@ entry = ConversationHandler(
         },
         fallbacks=[
             code,
-            get_pay
+            get_pay,
+            rules
         ],
     )
 
@@ -63,6 +65,7 @@ HANDLERS = [
     ),
     code,
     get_pay,
+    rules,
     entry,
     ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.aviso_pago, pattern=consts.BTS['INLINE']['PAGO'])],
@@ -72,13 +75,11 @@ HANDLERS = [
         fallbacks=[],
         per_user=True
     ),
-    # MessageHandler(StatusUpdate.NEW_CHAT_MEMBERS, chat_join.new_member),
     ChatMemberHandler(callback=chat_join.new_member, chat_member_types=ChatMemberHandler.CHAT_MEMBER),
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['ACTIVATE']),
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['UPDATE']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['SUB']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['CODE']),
-    
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['REELS']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['FOLLOW']),
     CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['ACCEPT']}2"),

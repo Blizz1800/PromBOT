@@ -8,7 +8,8 @@ TOKEN_NAME = ["A", "B"]
 
 GROUP_ID = '@test_blizzbot_group'
 
-MARKDOWN = "Markdown"
+STD_MK = MARKDOWN = "Markdown"
+
 
 ADMINS = [
     BLIZZ,
@@ -28,6 +29,7 @@ BTS = {
     "INVITE": "Invitar a...",
     "FOLLOWERS": "Obtener Seguidores",
     "BACK": "Volver",
+    "REGLAS": "🗣️📣Reglas📑",
     "REFERIDOS": {
         "KEY": "Referidos",
         "GET": "Ver Referidos",
@@ -70,7 +72,8 @@ BTNS = {
             [BTS['FOLLOWERS']],
             ["{user}", BTS['REFERIDOS']['KEY']],
             [BTS['MONEY']['GET'], BTS['MONEY']['POST']],
-            [BTS['RIFAS']['KEY']]
+            [BTS['RIFAS']['KEY']],
+            [BTS['REGLAS']]
         ],
     "RIFA": [
         [BTS['RIFAS']['GET'], BTS['RIFAS']['POST']],
@@ -80,6 +83,13 @@ BTNS = {
 }
 
 MESSAGES = {
+    "REGLAS": {
+        "MARKDOWN": STD_MK,
+        "MSG": [
+            "Mensaje de reglas q me debe dar el jhonny"
+        ],
+        "BTN": None
+    },
     "START": {
         "MARKDOWN": None,
         "MSG": [

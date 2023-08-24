@@ -43,6 +43,9 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif msg == BTS['RIFAS']['KEY']:
         analytics.button_press(BTS['RIFAS']['KEY'], update.effective_user.id)
         return await control('RIFAS', update, context, 5)
+    elif msg == BTS['REGLAS']:
+        analytics.button_press(BTS['REGLAS'], update.effective_user.id)
+        return await control('REGLAS', update, context)
     else:
         await control('START:3', update, context)
     return 0
