@@ -34,6 +34,7 @@
 	[ ] Sistema de venta basado en tokens
 	[ ] Venta de servicios de obtencion de subs para sus redes
 	[x] Ganancias de token x referido
+	[ ] Ofrecer link de referido en otras redes y bots
 	
 ## Medios de obtencion de monedas digitales mediante las redes:
 	[x] YouTube
