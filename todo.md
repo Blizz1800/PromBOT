@@ -46,8 +46,8 @@
 ## Medios de obtencion de monedas digitales mediante las redes:
 	[x] YouTube
 	[x] Instagram
-	[ ] Whatsapp
-	[ ] Telegram
+	[x] Whatsapp
+	[x] Telegram
 	[ ] ...
 	
 # Necesidades:
