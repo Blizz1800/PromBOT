@@ -30,15 +30,18 @@
 	[x] Sistema de estadisticas del pulsado de botones
 	[U] Sistema de estadsticas de ganancia de tokens
 	[x] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie 
-	[ ] ↑↑↑ Solicitud de explicacion de la denegacion de foto ↑↑↑
 	[ ] Sistema de venta basado en tokens
 	[ ] Venta de servicios de obtencion de subs para sus redes
 	[x] Ganancias de token x referido
-	[ ] Ofrecer link de referido en otras redes y bots
+	[ ] Hacer spam y verificar x fotos para whatsapp
+	[ ] Hacer spam y verificar x fotos para telegram
+	[ ] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
 	
 ## Medios de obtencion de monedas digitales mediante las redes:
 	[x] YouTube
-	[-] Instagram
+	[x] Instagram
+	[ ] Whatsapp
+	[ ] Telegram
 	[ ] ...
 	
 # Necesidades:
