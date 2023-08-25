@@ -29,17 +29,17 @@
 	[x] Obtencion de pagos pendientes mediante un comando
 	[x] Formula para la variacion de los valores de extraccion minimos
 	[x] Sistema de estadisticas del pulsado de botones
-	[U] Sistema de estadsticas de ganancia de tokens
 	[x] Verificacion de comentarios via fotos enviadas una a una a los admin, y el usuario envie 
 	[x] Ganancias de token x referido
 	[x] Hacer spam y verificar x fotos para whatsapp
 	[x] Hacer spam y verificar x fotos para telegram
 	[T] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
+	[U] Sistema de estadsticas de ganancia de tokens
 
 ## Fase 2
 
-	[ ] Sistema de venta basado en tokens
 	[-] Sistema de rifas
+	[ ] Sistema de venta basado en tokens
 	[ ] Venta de servicios de obtencion de subs para sus redes
 
 
