@@ -1,6 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
-from . import DB, validate, control, analytics
+from . import DB, validate, control, analytics, get_db
 from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER
 from .cmd_handlers import net, money
 import time
@@ -12,6 +12,46 @@ from bson.objectid import ObjectId
 wa_code = False      # WAnna CODE
 wa_photo = False     # WAnna Photo
 wa_many = False      # WAnna Many Items
+
+async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+    base = get_msg(context.user_data['NET'])
+    analytics.button_press(data, update.effective_chat.id, True)
+    text = base['INST']['BOT']
+    db = get_db('static')
+    db = db['referrals']
+    refs = db.find({'net': 'tlgm'})
+    if refs:
+        btns = []
+        kb = []
+        for i in refs:
+            if len(btns) >= 2:
+                kb.append(btns)
+                btns = [InlineKeyboardButton(i['name'], i['url'])]
+                continue
+            btns.append(InlineKeyboardButton(i['name'], i['url']))
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="No tenemos redes para seguir en este momento")
+    try:
+        await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
+    except:
+        pass
+    return 0
+
+async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+    base = get_msg(context.user_data['NET'])
+    analytics.button_press(data, update.effective_chat.id, True)
+    text = base['INST']['SPAM']
+    try:
+        await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
+    except:
+        pass
+    return 0
 
 async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for i in context.user_data['fotos']:
@@ -37,7 +77,7 @@ async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pass
     return 0
 
-async def ig_get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo[-1]
     if not isinstance(context.user_data.get('fotos', None), list):
         context.user_data['fotos'] = []
@@ -239,6 +279,7 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         is_accept = True
         status = 1
         inc = 1
+        warn = 0
         # ban = False
     elif btn == f"{BTS['INLINE']['DENY']}2":
         u = DB['users'].find_one({"t_id": user})
@@ -363,6 +404,9 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         elif msg == BTS['NET']['YT']:
             context.user_data['NET'] = 'YT'
             await net.yt(update, context)
+        elif msg == BTS['NET']['TLGM']:
+            context.user_data['NET'] = 'TLGM'
+            await net.tlgm(update, context)
         elif msg == BTS['BACK']:
             p = get_msg('START', user=update.effective_user.full_name)
             await context.bot.send_message(chat_id=id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])

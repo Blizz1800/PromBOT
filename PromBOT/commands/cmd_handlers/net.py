@@ -1,7 +1,13 @@
 from telegram import Update, ReplyKeyboardMarkup, constants, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from PromBOT.commands import DB, consts
+from PromBOT.commands import DB, consts, control
+
+async def tlgm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await control('TLGM', update=update, context=context)
+
+async def whts(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await control('WHTS', update=update, context=context)
 
 async def yt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)

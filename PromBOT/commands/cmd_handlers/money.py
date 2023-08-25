@@ -5,8 +5,8 @@ from PromBOT.commands import DB
 
 async def ganar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns = []
-    btns.append([BTS['NET']['YT']])
-    btns.append([BTS['NET']['IG']])
+    btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
+    btns.append([BTS['NET']['TLGM']])
     btns.append([BTS['BACK']])
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Elije una red para ganar dinero ;)", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True, input_field_placeholder="Red Social"))

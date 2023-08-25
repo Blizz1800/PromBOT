@@ -52,11 +52,13 @@ BTS = {
         "PAGO": "Avisar de pago",
         "MORE": "🥲Mostrar mas💸",
         "UPDATE": "Actualizar informacion",
-
+        "BOT": "Bots",
+        "SPAM": "Publicaciones"
     },
     "NET": {
         "IG": "Instagram",
-        "YT": "YouTube"
+        "YT": "YouTube",
+        "TLGM": "Telegram"
     },
     "RIFAS": {
         "KEY": "Rifas",
@@ -116,6 +118,27 @@ MESSAGES = {
             "FOLLOW": "Mensaje de instrucciones para cuando se quiera ganar con seguimiento",
             "REELS": "Mensaje de instrucciones para cuando se quiera ganar viendo reels",
             "COMENT": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
+        }
+    },
+    "TLGM": {
+        "MARKDOWN": None,
+        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "BTN": InlineKeyboardMarkup([[
+            InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM']), InlineKeyboardButton(BTS['INLINE']['BOT'], callback_data=BTS['INLINE']['BOT'])
+        ]]),
+        "INST": {
+            "BOT": "Mensaje de instrucciones para cuando se quiera ganar con BOTs",
+            "SPAM": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
+        }
+    },
+    "WHTS": {
+        "MARKDOWN": None,
+        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "BTN": InlineKeyboardMarkup([[
+            InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM'])
+        ]]),
+        "INST": {
+            "SPAM": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
         }
     },
     "INVALID_CODE": {

@@ -7,6 +7,11 @@ from os import getenv
 from .db_init import db_init_update
 from .commands import consts, start, pagos, reglas, code, start_handler, im_user, db_len, referrers, money_handler, cmd_handlers, chat_join, rifa
 
+from warnings import filterwarnings
+from telegram.warnings import PTBUserWarning
+
+filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
+
 rules = CommandHandler('rules', reglas.get)
 get_pay = CommandHandler('get_pays', pagos.get_pays)
 code = ConversationHandler(
@@ -57,11 +62,20 @@ entry = ConversationHandler(
 
 HANDLERS = [
     ConversationHandler(
+        entry_points=[CallbackQueryHandler(money_handler.tlgm_spam, pattern=consts.BTS['INLINE']['SPAM']),CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT'])],
+        states={
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
+        },
+        fallbacks=[],
+        per_user=True,
+    ),
+    ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.ig_comments, pattern=consts.BTS['INLINE']['COMENT'])],
         states={
-            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.ig_get_photo), CommandHandler('end', money_handler.ig_end)]
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        per_user=True,
     ),
     code,
     get_pay,
@@ -73,7 +87,7 @@ HANDLERS = [
             1: [MessageHandler((TEXT | PHOTO) & (~COMMAND), money_handler.envio)],
         },
         fallbacks=[],
-        per_user=True
+        per_user=True,
     ),
     ChatMemberHandler(callback=chat_join.new_member, chat_member_types=ChatMemberHandler.CHAT_MEMBER),
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['ACTIVATE']),
