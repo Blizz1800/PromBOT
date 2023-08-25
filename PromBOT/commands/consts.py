@@ -58,7 +58,8 @@ BTS = {
     "NET": {
         "IG": "Instagram",
         "YT": "YouTube",
-        "TLGM": "Telegram"
+        "TLGM": "Telegram",
+        "WHTS": "Whatsapp"
     },
     "RIFAS": {
         "KEY": "Rifas",

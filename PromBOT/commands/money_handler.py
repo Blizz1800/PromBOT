@@ -314,7 +314,10 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
     await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{rec}")
     if not is_accept:
-        await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal")
+        if inc >= 0:
+            await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal")
+        else:
+            await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, hemos descontado {inc * -1} de sus {TOKEN_NAME[1]}")
     # return -1
 
 
@@ -383,8 +386,8 @@ async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns = []
-    btns.append([BTS['NET']['YT']])
-    btns.append([BTS['NET']['IG']])
+    btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
+    btns.append([BTS['NET']['TLGM'], [BTS['NET']['WHTS']]])
     btns.append([BTS['BACK']])
 
     global wa_code, wa_photo, wa_many
@@ -407,6 +410,9 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         elif msg == BTS['NET']['TLGM']:
             context.user_data['NET'] = 'TLGM'
             await net.tlgm(update, context)
+        elif msg == BTS['NET']['WHTS']:
+            context.user_data['NET'] = 'WHTS'
+            await net.whts(update, context)
         elif msg == BTS['BACK']:
             p = get_msg('START', user=update.effective_user.full_name)
             await context.bot.send_message(chat_id=id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
