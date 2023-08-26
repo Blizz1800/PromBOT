@@ -17,6 +17,7 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     await query.answer()
+    # print(context.user_data['NET'])
     base = get_msg(context.user_data['NET'])
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['BOT']
@@ -60,7 +61,7 @@ async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for a in ADMINS:
             await context.bot.send_photo(chat_id=a, photo=i[1], reply_markup=kb_admin)
     for i in ADMINS:
-        await context.bot.send_message(chat_id=i, text="Pruebas de los comentarios del usuario `{USER}`({ID})".format(USER=update.effective_user.full_name, ID=update.effective_user.id))
+        await context.bot.send_message(chat_id=i, text="Pruebas de los comentarios del usuario `{USER}`({ID})".format(USER=update.effective_user.full_name, ID=update.effective_chat.id))
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Enviadas sus pruebas a los admin, espere respuesta...")
 
 async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -68,7 +69,7 @@ async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     await query.answer()
     base = get_msg(context.user_data['NET'])
-    analytics.button_press(BTS['INLINE']['COMENT'], update.effective_user.id, True)
+    analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
     text = base['INST']['COMENT']
 
     try:
@@ -217,10 +218,9 @@ async def target_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return 1
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global wa_code, wa_photo, wa_many
-    wa_photo = False
-    wa_code = False
-    wa_many = False
+    context.user_data['wa_photo'] = False
+    context.user_data['wa_code'] = False
+    context.user_data['wa_many'] = False
     query = update.callback_query
     data = query.data
     await query.answer()
@@ -228,27 +228,27 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # print(base)
     #   YOUTUBE
     if data == BTS['INLINE']['SUB']:
-        analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_user.id, True)
+        analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
         text = base['INST']['SUB']
-        wa_photo = True
+        context.user_data['wa_photo'] = True
     elif data == BTS['INLINE']['CODE']:
-        analytics.button_press(BTS['INLINE']['CODE'], update.effective_user.id, True)
+        analytics.button_press(BTS['INLINE']['CODE'], update.effective_chat.id, True)
         text = base['INST']['CODE']
-        wa_code = True
+        context.user_data['wa_code'] = True
     #   INSTAGRAM
     # elif data == BTS['INLINE']['COMENT']:
-    #     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_user.id, True)
+    #     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
     #     text = base['INST']['COMENT']
     #     wa_photo = True
     #     wa_many = False
     elif data == BTS['INLINE']['FOLLOW']:
-        analytics.button_press(BTS['INLINE']['FOLLOW'], update.effective_user.id, True)
+        analytics.button_press(BTS['INLINE']['FOLLOW'], update.effective_chat.id, True)
         text = base['INST']['FOLLOW']
-        wa_photo = True
+        context.user_data['wa_photo'] = True
     elif data == BTS['INLINE']['REELS']:
-        analytics.button_press(BTS['INLINE']['REELS'], update.effective_user.id, True)
+        analytics.button_press(BTS['INLINE']['REELS'], update.effective_chat.id, True)
         text = base['INST']['REELS']
-        wa_code = True
+        context.user_data['wa_code'] = True
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except:
@@ -376,21 +376,22 @@ async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(TK=TOKEN_NAME[1]))
         return 0
     elif msg == BTS['NO']:
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=f"Introduzca el destino donde desea recibir su dinero.")
+        kb = ReplyKeyboardMarkup([
+            [ BTS['CANCEL'] ]
+            ], resize_keyboard=True)
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=kb, parse_mode="Markdown", text=f"Introduzca el destino donde desea recibir su dinero.")
     elif msg == BTS['CANCEL']:
         return await control('START:2', update, context, -1)
     else:
-        money.update_target(update.effective_user.id, msg)
+        money.update_target(update.effective_chat.id, msg)
         await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=yes_no_kb, text=f'Es esta su nueva direccion de destino para recibir sus pagos?\n\n{msg}')
     return 1
 
 async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns = []
     btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
-    btns.append([BTS['NET']['TLGM'], [BTS['NET']['WHTS']]])
+    btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
     btns.append([BTS['BACK']])
-
-    global wa_code, wa_photo, wa_many
 
     id = update.effective_chat.id
     msg = update.message.text
@@ -400,7 +401,7 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             "codes": None
         }}
     )
-    if not wa_code and not wa_photo:
+    if not context.user_data.get('wa_code', False) and not context.user_data.get('wa_photo', False):
         if msg == BTS['NET']['IG']:
             context.user_data['NET'] = 'IG'
             await net.ig(update, context)
@@ -414,18 +415,19 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             context.user_data['NET'] = 'WHTS'
             await net.whts(update, context)
         elif msg == BTS['BACK']:
-            p = get_msg('START', user=update.effective_user.full_name)
-            await context.bot.send_message(chat_id=id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
-            return 0
-    elif wa_code:
+            # p = get_msg('START', user=update.effective_user.full_name)
+            # await context.bot.send_message(chat_id=id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
+            return await control('START', update, context)
+            # return 0
+    elif context.user_data.get('wa_code', False):
         invalid = get_msg('INVALID_CODE')
         if msg == BTS['NO_CODE']:
             msg = get_msg('NO_CODE')['MSG']
             btns = []
-            btns.append([BTS['NET']['YT']])
-            btns.append([BTS['NET']['IG']])
+            btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
+            btns.append([BTS['NET']['TLGM'], [BTS['NET']['WHTS']]])
             btns.append([BTS['BACK']])
-            wa_code = False
+            context.user_data['wa_code'] = False
 
             await context.bot.send_message(chat_id=id, text=msg, reply_markup=ReplyKeyboardMarkup(keyboard=btns, resize_keyboard=True))
             return 2
@@ -439,14 +441,14 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
                 msg = get_msg('NO_CODE')['MSG']
                 
                 await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*+1 {TOKEN_NAME[0]}*", parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
-                wa_code = False
+                context.user_data['wa_code'] = False
             else:
                 await context.bot.send_message(chat_id=id, text="Ese codigo ya ha sido usado >:(")
                 await context.bot.send_message(chat_id=id, text=invalid['MSG'], reply_markup=invalid['BTN'], parse_mode=invalid['MARKDOWN'])
         else:
             await context.bot.send_message(chat_id=id, text="Ese codigo no existe!")
             await context.bot.send_message(chat_id=id, text=invalid['MSG'], reply_markup=invalid['BTN'], parse_mode=invalid['MARKDOWN'])
-    elif wa_photo:
+    elif context.user_data.get('wa_photo', False):
         if update.message.photo:
             data_id = DB['requests'].insert_one(
                 {
@@ -458,11 +460,13 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
                 }
             ).inserted_id
             for i in ADMINS:
-                await context.bot.send_photo(chat_id=i, parse_mode="Markdown", photo=update.message.photo[-1].file_id, caption=f"El usuario {update.effective_chat.full_name}{id}), ha enviado esta prueba de su subscripcion", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(BTS['INLINE']['ACCEPT'], callback_data=f"{BTS['INLINE']['ACCEPT']}|{data_id}"), InlineKeyboardButton(BTS['INLINE']['DENY'], callback_data=f"{BTS['INLINE']['DENY']}|{data_id}")]]))
+                await context.bot.send_photo(chat_id=i, parse_mode="Markdown", photo=update.message.photo[-1].file_id, caption=f"El usuario {update.effective_user.full_name}{id}), ha enviado esta prueba de su subscripcion", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(BTS['INLINE']['ACCEPT'], callback_data=f"{BTS['INLINE']['ACCEPT']}|{data_id}"), InlineKeyboardButton(BTS['INLINE']['DENY'], callback_data=f"{BTS['INLINE']['DENY']}|{data_id}")]]))
             await context.bot.send_message(chat_id=id, parse_mode="Markdown", text="Por favor, espere que le avisemos si su imagen cumple los requisitos", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+            return 2
         else:
+            # pprint(btns)
             await context.bot.send_message(chat_id=id, text="No photo in message", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
         
-        wa_photo = False
+        context.user_data['wa_photo'] = False
 
     return 2

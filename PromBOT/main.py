@@ -15,16 +15,16 @@ filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBU
 rules = CommandHandler('rules', reglas.get)
 get_pay = CommandHandler('get_pays', pagos.get_pays)
 code = ConversationHandler(
-    per_user=True,
+                per_user=True,
                 entry_points=[CommandHandler('code', code.gen_msg)],
                 states={
                     0: [MessageHandler(TEXT & COMMAND, code.gen_code)]
                 },
-                fallbacks=[lambda: print('No se encontró el código')],
+                fallbacks=[lambda update, context: print('No se encontró el código')],
             )
 
 entry = ConversationHandler(
-    per_user=True,
+        per_user=True,
         entry_points=[CommandHandler('start', start.start), MessageHandler(TEXT & (~COMMAND), start_handler.start_handler)],
         states={
             0: [MessageHandler(TEXT & (~COMMAND), start_handler.start_handler)],
@@ -45,7 +45,7 @@ entry = ConversationHandler(
             5: [ConversationHandler(
                 entry_points=[MessageHandler(TEXT & (~COMMAND), rifa.base_handler)],
                 states={
-                    0: [MessageHandler(TEXT & (~COMMAND), rifa.get_info)]
+                    0: [MessageHandler(TEXT & (~COMMAND), rifa.base_handler)]
                 },
                 fallbacks=[],
                 map_to_parent={

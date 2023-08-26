@@ -8,7 +8,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
 
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
     id = update.effective_chat.id
-    name = update.effective_chat.full_name
+    name = update.effective_user.full_name
     user = f"@{update.effective_chat.username}"   
     tk_b_start = 0
 
@@ -33,8 +33,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                         else:
                             username = referral['name']                    
                         # DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
-                        await context.bot.send_message(referral['t_id'], text=f"Has referido a @{update.effective_user.username}, usted recibira su recomenpsa cuando @{update.effective_user.username} sea usuario activo")
-                        await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_user.first_name}! you have invited by {referral['user']}, you will earn 2 {consts.TOKEN_NAME[1]} when you have been activated")
+                        await context.bot.send_message(referral['t_id'], text=f"Has referido a @{update.effective_chat.username}, usted recibira su recomenpsa cuando @{update.effective_chat.username} sea usuario activo")
+                        await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_chat.first_name}! you have invited by {referral['user']}, you will earn 2 {consts.TOKEN_NAME[1]} when you have been activated")
                         # tk_b_start = 2
                 else:
                     await context.bot.send_message(chat_id=id, text=f"No user found with this id ({context.args[0]})")

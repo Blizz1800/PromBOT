@@ -20,8 +20,14 @@ async def extraer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     id = update.effective_chat.id
     me = DB['users'].find_one({"t_id": id})
     if me['target']:
-        kb = ReplyKeyboardMarkup([[BTS['YES'], BTS['NO']]], resize_keyboard=True)
+        kb = ReplyKeyboardMarkup([
+            [BTS['YES'], BTS['NO']],
+            [ BTS['CANCEL'] ]
+            ], resize_keyboard=True)
         await context.bot.send_message(chat_id=id, text=f"Es este, {me['target']}, su destinatario para la extraccion? Si no es este, por favor introduzca su nuevo destinatario", reply_markup=kb                                              )
     else:
-        await context.bot.send_message(chat_id=id, text=f"Por Favor Introduzca su destinatario para donde desea recibir el pago.")
+        kb = ReplyKeyboardMarkup([
+            [ BTS['CANCEL'] ]
+            ], resize_keyboard=True)
+        await context.bot.send_message(chat_id=id, text=f"Por Favor Introduzca su destinatario para donde desea recibir el pago.", reply_markup=kb)
     return 4

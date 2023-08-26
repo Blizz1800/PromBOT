@@ -13,7 +13,7 @@ async def get_referidos(update, context) -> int:
     return 1
 async def get_referidosV2(update, context):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-    my_id = update.effective_user.id
+    my_id = update.effective_chat.id
     me = DB['users'].find_one({'t_id': my_id})
     reffs = me['referrals']
     result = []

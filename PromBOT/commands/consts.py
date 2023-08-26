@@ -24,6 +24,7 @@ COMMANDS = [
 CANTIDAD_EXTRAER = "De acuerdo, diga su cantidad de *{TK}* a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\nMinimo a extraer: 10{TK}"
 
 BTS = {
+    "UPDATE": "Actualizar",
     "YES": "Si, es esta!",
     "NO": "No, no lo es",
     "INVITE": "Invitar a...",
@@ -171,10 +172,12 @@ def get_msg(key, *args, **kargs):
         if kargs['user'] is not None or len(args) > 0 and args[0] is not None:
             mk = MESSAGES[key]['MARKDOWN']
             msg = MESSAGES[key]['MSG'][v].format(user=kargs['user'])
-            btns = MESSAGES[key]['BTN']
-            for i, v in enumerate(btns):
-                for i2, j in enumerate(v):
-                    btns[i][i2] = j.format(user=kargs['user'])
+            btns = [ ] # MESSAGES[key]['BTN']
+            for i, v in enumerate(MESSAGES[key]['BTN']):
+                btns.append([])
+                for j in v:
+                    # print(f"\t{i}\t{j}\t{kargs['user']}")
+                    btns[i].append(j.format(user=kargs['user']))
             return {
                 "MARKDOWN": mk,
                 "MSG": msg,

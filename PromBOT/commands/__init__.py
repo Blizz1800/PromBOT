@@ -17,7 +17,7 @@ def get_db(db:str = "vendermejor"):
 
 async def control(key: str, update: Update, context: ContextTypes.DEFAULT_TYPE, ret=0):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
-    m = get_msg(key, user=update.effective_chat.full_name)
+    m = get_msg(key, user=update.effective_user.full_name)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'], parse_mode=m['MARKDOWN'], reply_markup=m['BTN'])
     return ret
 
