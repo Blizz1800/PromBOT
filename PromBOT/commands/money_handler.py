@@ -37,8 +37,9 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No tenemos redes para seguir en este momento")
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
-    except:
-        pass
+    except Exception as e: 
+        print(e)
+        await query.answer()
     return 0
 
 async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -50,8 +51,9 @@ async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = base['INST']['SPAM']
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
-    except:
-        pass
+    except Exception as e:
+        print(e)
+        await query.answer()
     return 0
 
 async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,12 +72,14 @@ async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     base = get_msg(context.user_data['NET'])
     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
+    # print(base)
     text = base['INST']['COMENT']
 
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
-    except:
-        pass
+    except Exception as e:
+        print(e)
+        await query.answer()
     return 0
 
 async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -229,7 +233,10 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     #   YOUTUBE
     if data == BTS['INLINE']['SUB']:
         analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
-        text = base['INST']['SUB']
+        try:
+            text = base['INST']['SUB']
+        except KeyError as e:
+            print(f"Ocurrio un error\t{e}\nBase: {base}")
         context.user_data['wa_photo'] = True
     elif data == BTS['INLINE']['CODE']:
         analytics.button_press(BTS['INLINE']['CODE'], update.effective_chat.id, True)
@@ -252,7 +259,8 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except:
-        pass
+        print(e)
+        await query.answer()
 
 async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -311,7 +319,11 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     else:
         stat = "denegado"
         rec = "."
-    await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
+    try:
+        await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
+    except Exception as e:
+        print(e)
+        await query.answer()
     await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{rec}")
     if not is_accept:
         if inc >= 0:
@@ -364,7 +376,11 @@ async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         stat = "denegado"
         rec = "."
-    await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
+    try:
+        await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
+    except Exception as e:
+        print(e)
+        await query.answer()
     await context.bot.send_message(chat_id=user, text=f"Se ha {stat} su solicitud{rec}")
 
 async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -396,36 +412,43 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     id = update.effective_chat.id
     msg = update.message.text
     DB['users'].update_many(
-        {},
-        {"$pull":{
-            "codes": None
-        }}
-    )
-    if not context.user_data.get('wa_code', False) and not context.user_data.get('wa_photo', False):
-        if msg == BTS['NET']['IG']:
-            context.user_data['NET'] = 'IG'
-            await net.ig(update, context)
-        elif msg == BTS['NET']['YT']:
-            context.user_data['NET'] = 'YT'
-            await net.yt(update, context)
-        elif msg == BTS['NET']['TLGM']:
-            context.user_data['NET'] = 'TLGM'
-            await net.tlgm(update, context)
-        elif msg == BTS['NET']['WHTS']:
-            context.user_data['NET'] = 'WHTS'
-            await net.whts(update, context)
-        elif msg == BTS['BACK']:
-            # p = get_msg('START', user=update.effective_user.full_name)
-            # await context.bot.send_message(chat_id=id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
-            return await control('START', update, context)
-            # return 0
-    elif context.user_data.get('wa_code', False):
+    {},
+    {"$pull":{
+        "codes": None
+    }})
+    
+    context.user_data['reset'] = False
+    if msg == BTS['NET']['IG']:
+        context.user_data['NET'] = 'IG'
+        context.user_data['reset'] = True
+        await net.ig(update, context)
+    elif msg == BTS['NET']['YT']:
+        context.user_data['NET'] = 'YT'
+        context.user_data['reset'] = True
+        await net.yt(update, context)
+    elif msg == BTS['NET']['TLGM']:
+        context.user_data['NET'] = 'TLGM'
+        context.user_data['reset'] = True
+        await net.tlgm(update, context)
+    elif msg == BTS['NET']['WHTS']:
+        context.user_data['NET'] = 'WHTS'
+        context.user_data['reset'] = True
+        await net.whts(update, context)
+    elif msg == BTS['BACK']:
+        context.user_data['reset'] = True
+        return await control('START:2', update, context)
+
+    if context.user_data.get('reset', False):
+        context.user_data['wa_code'], context.user_data['wa_photo'], context.user_data['wa_code']  = (False, False, False)
+        context.user_data['reset'] = False
+
+    if context.user_data.get('wa_code', False):
         invalid = get_msg('INVALID_CODE')
         if msg == BTS['NO_CODE']:
             msg = get_msg('NO_CODE')['MSG']
             btns = []
             btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
-            btns.append([BTS['NET']['TLGM'], [BTS['NET']['WHTS']]])
+            btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
             btns.append([BTS['BACK']])
             context.user_data['wa_code'] = False
 

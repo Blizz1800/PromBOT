@@ -70,6 +70,14 @@ HANDLERS = [
         per_user=True,
     ),
     ConversationHandler(
+        entry_points=[CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT'])],
+        states={
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
+        },
+        fallbacks=[],
+        per_user=True,
+    ),
+    ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.ig_comments, pattern=consts.BTS['INLINE']['COMENT'])],
         states={
             0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
@@ -96,6 +104,8 @@ HANDLERS = [
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['CODE']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['REELS']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['FOLLOW']),
+    # CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT']),
+    # CallbackQueryHandler(money_handler.tlgm_spam, pattern=consts.BTS['INLINE']['SPAM']),
     CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['ACCEPT']}2"),
     CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['DENY']}2"),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['ACCEPT']),

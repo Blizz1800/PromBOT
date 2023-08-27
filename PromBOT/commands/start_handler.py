@@ -14,10 +14,10 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     group_id = '@test_blizzbot_group'
     user_in_chat = await context.bot.get_chat_member(group_id, update.effective_chat.id)
     inGroup = not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft))
-    DB['users'].update_one({'t_id': update.effective_chat.id}, {'$set': {'inGroup': inGroup, 'active': inGroup and name['inviteds']['count'] >= 5}})
 
 
     if name is not None:
+        DB['users'].update_one({'t_id': update.effective_chat.id}, {'$set': {'inGroup': inGroup, 'active': inGroup and name['inviteds']['count'] >= 5}})
         if name['banned']:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Tu has sido baneado, x tanto no puedes usar este servicio nunca mas\nPara mas dudas contactar los administradores", reply_markup=ReplyKeyboardRemove())
             return -1
@@ -107,7 +107,8 @@ async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         analytics.button_press(BTS['INLINE']['ACTIVATE'], update.effective_chat.id, True)
     try:
         await query.edit_message_text(reply_markup=kb, text=txt.format(ID=group_id, MANY=5-count, COUNT=count))
-    except:
-        pass
+    except Exception as e:
+        print(e)
+        query.answer()
 
     
