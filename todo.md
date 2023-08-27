@@ -36,6 +36,13 @@
 	[T] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
 	[U] Sistema de estadsticas de ganancia de tokens
 
+### Bug Fixing
+	[x] Error en el nombre de un boton
+	[x] Bucle infinito en rifas
+	[x] Los inline de telegram no cambiaban
+	[x] Algunos inline se quedaban brillando
+	[x] Se borraron textos pero se recuperaron
+	
 ## Fase 2
 
 	[-] Sistema de rifas
