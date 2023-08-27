@@ -23,7 +23,11 @@ async def get_info(update, context):
         resp += f"_Telefono_: {me['phone']}\n"
     if me['referrer']:
         tmp = DB['users'].find_one({'t_id': me['referrer']})
-        resp += f"_Anfitrion_: [{tmp['name']}]tg://user?id={me['referrer']})\n"
+        if tmp['user']:
+            resp += f"_Anfitrion_: {tmp['user']}\n"
+        else:
+            resp += f"_Anfitrion_: {tmp['name']}\n"
+
 
     if me['token_a'] >= 17:
         DB['users'].update_one({"t_id": me['t_id']}, {

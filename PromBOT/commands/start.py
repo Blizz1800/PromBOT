@@ -45,7 +45,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                 
 
     group_id = '@test_blizzbot_group'
-    user_in_chat = await context.bot.get_chat_member(group_id, id)
+    user_in_chat = await context.bot.get_chat_member(group_id, update.effective_user.id)
 
     codes = DB['codes'].find({})
     code_l = []

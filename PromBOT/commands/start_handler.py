@@ -12,12 +12,12 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # print(f"{name['name']}\t{name['t_id']}")
 
     group_id = '@test_blizzbot_group'
-    user_in_chat = await context.bot.get_chat_member(group_id, update.effective_chat.id)
+    user_in_chat = await context.bot.get_chat_member(group_id, update.effective_user.id)
     inGroup = not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft))
 
 
     if name is not None:
-        DB['users'].update_one({'t_id': update.effective_chat.id}, {'$set': {'inGroup': inGroup, 'active': inGroup and name['inviteds']['count'] >= 5}})
+        DB['users'].update_one({'t_id': update.effective_chat.id}, {'$set': {'inGroup': inGroup}})
         if name['banned']:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Tu has sido baneado, x tanto no puedes usar este servicio nunca mas\nPara mas dudas contactar los administradores", reply_markup=ReplyKeyboardRemove())
             return -1
@@ -50,8 +50,8 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await control('START:3', update, context)
     return 0
-        
-async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     await query.answer()
@@ -59,56 +59,73 @@ async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     count = DB['users'].find_one({'t_id': query.from_user.id})['inviteds']['count'] 
     group_id = '@test_blizzbot_group'
     user_in_chat = await context.bot.get_chat_member(group_id, query.from_user.id)
-
+    analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
 
     kb = InlineKeyboardMarkup(
-        [[InlineKeyboardButton(BTS['UPDATE'], callback_data=BTS['UPDATE'])]]
+        [[InlineKeyboardButton(BTS['INLINE']['UPDATE'], callback_data=BTS['INLINE']['UPDATE'])]]
     )
+    
 
-    txt = "Usted debe ingresar al grupo {ID} y agregar {MANY} usuarios mas\n\nUsuarios agregados: {COUNT}/5"
-
-    if data == BTS['INLINE']['UPDATE']:
-        analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
-        if not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)):
-            if  count >= 5:
-                me = DB['users'].find_one({'t_id': query.from_user.id})
-                many = 0
-                if me['referrer']:
-                    many = 2
-                    DB['users'].update_one(
-                        {'t_id': me['referrer']},
-                        {
-                            '$inc': {
-                                'token_b': 1
-                            }
-                        }
-                    )
-                    await context.bot.send_message(chat_id=me['referrer'], text="Su referido {{{USER}}} ha sido activado, usted ha ganado 1 {TOKEN}".format(USER=me['name'], TOKEN=TOKEN_NAME[1]))
+    if not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)):
+        if  count >= 5:
+            me = DB['users'].find_one({'t_id': query.from_user.id})
+            many = 0
+            if me['referrer']:
+                many = 2
                 DB['users'].update_one(
-                    {'t_id': query.from_user.id},
+                    {'t_id': me['referrer']},
                     {
-                        '$set': {
-                            'inGroup': not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)),
-                            'active': not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)) and count >= 5
-                        },
                         '$inc': {
-                            'token_b': many
+                            'token_b': 1
                         }
-                        
-                    })
-                if many > 0:
-                    bono = f"\n\n😱Ha recibido un bono de: {many} {TOKEN_NAME[1]}💸"
-                txt = "🎊Usted ya es un usuario activo🎉\nDisfrute de su subscripcion😊{BONO}".format(BONO=bono)
-            else:
-                txt = "Usted debe agregar aun {MANY} mas usuarios al grupo {ID}, ha agregado {COUNT}/5"
+                    }
+                )
+                await context.bot.send_message(chat_id=me['referrer'], text="Su referido {USER} ha sido activado, usted ha ganado 1 {TOKEN}".format(USER=me['name'], TOKEN=TOKEN_NAME[1]))
+            DB['users'].update_one(
+                {'t_id': query.from_user.id},
+                {
+                    '$set': {
+                        'inGroup': not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)),
+                        'active': not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)) and count >= 5
+                    },
+                    '$inc': {
+                        'token_b': many
+                    }
+                    
+                })
+            if many > 0:
+                bono = f"\n\n😱Ha recibido un bono de: {many} {TOKEN_NAME[1]}💸"
+            txt = "🎊Usted ya es un usuario activo🎉\nDisfrute de su subscripcion😊{BONO}".format(BONO=bono)
         else:
-            txt = "Usted no es miembro del grupo {ID}, por favor, ingresar al grupo y permanecer alli, e invitar {MANY} usuarios mas."
+            txt = "Usted debe agregar aun {MANY} mas usuarios al grupo {ID}, ha agregado {COUNT}/5"
     else:
-        analytics.button_press(BTS['INLINE']['ACTIVATE'], update.effective_chat.id, True)
+        txt = "Usted no es miembro del grupo {ID}, por favor, ingresar al grupo y permanecer alli, e invitar {MANY} usuarios mas."
     try:
         await query.edit_message_text(reply_markup=kb, text=txt.format(ID=group_id, MANY=5-count, COUNT=count))
     except Exception as e:
-        print(e)
+        # print(e)
         query.answer()
+
+
+async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+
+    count = DB['users'].find_one({'t_id': query.from_user.id})['inviteds']['count'] 
+    group_id = '@test_blizzbot_group'
+
+    analytics.button_press(BTS['INLINE']['ACTIVATE'], update.effective_chat.id, True)
+
+    kb = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(BTS['INLINE']['UPDATE'], callback_data=BTS['INLINE']['UPDATE'])]]
+    )
+
+    txt = "Usted debe ingresar al grupo {ID} y agregar {MANY} usuarios mas\n\nUsuarios agregados: {COUNT}/5"
+    try:
+        await query.edit_message_text(reply_markup=kb, text=txt.format(ID=group_id, MANY=5-count, COUNT=count))
+    except Exception as e:
+        # print(e)
+        await query.answer()
 
     
