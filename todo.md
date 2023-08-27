@@ -74,6 +74,8 @@ problemas tecnicos
 
 [x] Se borraron textos pero se recuperaron
 
+[x] Sistema de referidos funcionando
+
 ## Fase 2
 
 [-] Sistema de rifas
