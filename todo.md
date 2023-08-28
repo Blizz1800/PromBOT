@@ -43,6 +43,7 @@ problemas tecnicos
 
 * Tarjetas de credito
 * Numeros de telefono
+
 [x] Aviso al usuario mediante informacion visual su estado de pago
 
 [x] Obtencion de pagos pendientes mediante un comando
@@ -61,7 +62,7 @@ problemas tecnicos
 
 [T] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
 
-[U] Sistema de estadsticas de ganancia de tokens
+[T] Sistema de estadsticas de ganancia de tokens
 
 ### Bug Fixing
 [x] Error en el nombre de un boton
