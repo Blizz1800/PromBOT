@@ -34,6 +34,8 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btns = [InlineKeyboardButton(i['name'], i['url'])]
                 continue
             btns.append(InlineKeyboardButton(i['name'], i['url']))
+        print(btns)
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(btns), text="Estas son las redes q tenemos en este momento")
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No tenemos redes para seguir en este momento")
     try:
