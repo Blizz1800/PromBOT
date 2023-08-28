@@ -29,12 +29,11 @@ async def get_info(update, context):
             resp += f"_Anfitrion_: {tmp['name']}\n"
 
 
+
     if me['token_a'] >= 17:
         DB['users'].update_one({"t_id": me['t_id']}, {
-            "$dec": {
-                "token_a": 17
-            },
             "$inc": {
+                "token_a": -17,
                 "token_b": 1
             }
         })

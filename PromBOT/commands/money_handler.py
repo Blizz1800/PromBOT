@@ -19,6 +19,7 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     # print(context.user_data['NET'])
     base = get_msg(context.user_data['NET'])
+    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['BOT']
     db = get_db('static')
@@ -49,6 +50,7 @@ async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     base = get_msg(context.user_data['NET'])
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['SPAM']
+    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except Exception as e:
@@ -72,7 +74,7 @@ async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     base = get_msg(context.user_data['NET'])
     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
-    # print(base)
+    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
     text = base['INST']['COMENT']
 
     try:
@@ -233,10 +235,9 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     #   YOUTUBE
     if data == BTS['INLINE']['SUB']:
         analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
-        try:
-            text = base['INST']['SUB']
-        except KeyError as e:
-            print(f"Ocurrio un error\t{e}\nBase: {base}")
+        
+        text = base['INST']['SUB']
+        
         context.user_data['wa_photo'] = True
     elif data == BTS['INLINE']['CODE']:
         analytics.button_press(BTS['INLINE']['CODE'], update.effective_chat.id, True)
@@ -256,9 +257,11 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         analytics.button_press(BTS['INLINE']['REELS'], update.effective_chat.id, True)
         text = base['INST']['REELS']
         context.user_data['wa_code'] = True
+    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
+    
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
-    except:
+    except Exception as e:
         print(e)
         await query.answer()
 
@@ -313,6 +316,19 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
     DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc, "warns": warn}})
+    if inc > 0 :
+        m = context.bot_data[user]['METHOD']
+        if m == BTS['INLINE']['FOLLOW']:
+            m = analytics.TK_RED.INSTAGRAM_FOLL
+        elif m == BTS['INLINE']['REELS']:
+            m = analytics.TK_RED.INSTAGRAM_REEL
+        elif m == BTS['INLINE']['COMENT']:
+            m = analytics.TK_RED.INSTAGRAM_COM
+        elif m == BTS['INLINE']['CODE']:
+            m = analytics.TK_RED.YOUTUBE_CODES
+        elif m == BTS['INLINE']['SUB']:
+            m = analytics.TK_RED.YOUTUBE_SUB
+        analytics.earn_tk(m, user, inc, analytics.TK.B)
     if status > 0:
         stat = "aceptado"
         rec = f". Ha recibido *+{inc} {TOKEN_NAME[1]}*"

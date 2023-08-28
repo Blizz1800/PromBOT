@@ -17,7 +17,7 @@ class TK(Enum):
     A = 'tk_a'
     B = 'tk_b'
 
-def earn_tk(TK_RED: str, uid: int, many: int, tk: TK = TK.B):
+def earn_tk(TK_RED: str, uid: int | str, many: int, tk: TK = TK.B):
     global DB
     target_db = DB['tokens']
     if not target_db.find_one({'red': TK_RED}):

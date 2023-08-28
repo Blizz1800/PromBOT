@@ -80,6 +80,7 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         }
                     }
                 )
+                analytics.earn_tk(analytics.TK_RED.REFERIDOS, me['referrer'], 1, analytics.TK.B)
                 await context.bot.send_message(chat_id=me['referrer'], text="Su referido {USER} ha sido activado, usted ha ganado 1 {TOKEN}".format(USER=me['name'], TOKEN=TOKEN_NAME[1]))
             DB['users'].update_one(
                 {'t_id': query.from_user.id},
@@ -92,7 +93,10 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         'token_b': many
                     }
                     
-                })
+                }
+            )
+            analytics.earn_tk(analytics.TK_RED.REFERIDOS, query.from_user.id, 1, analytics.TK.B)
+            
             if many > 0:
                 bono = f"\n\n😱Ha recibido un bono de: {many} {TOKEN_NAME[1]}💸"
             txt = "🎊Usted ya es un usuario activo🎉\nDisfrute de su subscripcion😊{BONO}".format(BONO=bono)
