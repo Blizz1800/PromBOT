@@ -60,9 +60,9 @@ problemas tecnicos
 
 [x] Hacer spam y verificar x fotos para telegram
 
-[T] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
+[x] Unirse a nuestros referidos y verificar por fotos [ TELEGRAM ]
 
-[T] Sistema de estadsticas de ganancia de tokens
+[x] Sistema de estadsticas de ganancia de tokens
 
 ### Bug Fixing
 [x] Error en el nombre de un boton
