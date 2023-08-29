@@ -77,6 +77,10 @@ problemas tecnicos
 
 [x] Sistema de referidos funcionando
 
+[x] Sistema de estadisticas de ganancia de token fixed
+
+[x] obtener links para botones inline de referidos del bot
+
 ## Fase 2
 
 [-] Sistema de rifas
