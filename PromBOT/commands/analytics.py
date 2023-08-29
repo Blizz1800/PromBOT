@@ -17,12 +17,12 @@ class TK(Enum):
     A = 'tk_a'
     B = 'tk_b'
 
-def earn_tk(TK_RED: str, uid: int | str, many: int, tk: TK = TK.B):
+def earn_tk(tk_red: TK_RED, uid: int | str, many: int, tk: TK = TK.B):
     global DB
     target_db = DB['tokens']
-    if not target_db.find_one({'red': TK_RED}):
+    if not target_db.find_one({'red': tk_red}):
         target_db.insert_one({
-            'red': TK_RED,
+            'red': tk_red,
             'tk_a': 0,
             'tk_b': 0,
             'users': [
@@ -33,12 +33,17 @@ def earn_tk(TK_RED: str, uid: int | str, many: int, tk: TK = TK.B):
                 }
             ]
         })
-    if not target_db.find_one({ 'red': TK_RED, "users.uid": uid }):
-        target_db.update_one({ 'red': TK_RED,}, {"$push": {'users': {'uid': uid, 'tk_a': 0, 'tk_b': 0}}})
+    if not target_db.find_one({ 'red': tk_red, "users.uid": uid }):
+        target_db.update_one({ 'red': tk_red,}, {"$push": {'users': {'uid': uid, 'tk_a': 0, 'tk_b': 0}}})
     
+    print(f'TK_RED: {tk_red}')
+    tk = '_'.join(str(tk).lower().split('.'))
+    print(f'TK: {str(tk)}')
+    
+
     target_db.update_one(
         {
-            'red': TK_RED,
+            'red': tk_red,
             "users.uid": uid
         },
         {
@@ -48,8 +53,8 @@ def earn_tk(TK_RED: str, uid: int | str, many: int, tk: TK = TK.B):
             }
         }
     )
-    result = target_db.find_one({'red': TK_RED, "users.uid": uid}, {tk: 1, f'users.$.{tk}': 1})
-    return ({'tk_a': result['tk_a'], 'tk_b': result['tk_b']}, {'tk_a': result['users.$.tk_a'], 'tk_b': result['users.$.tk_b']})
+    result = target_db.find_one({'red': tk_red, "users.uid": uid})
+    return ({'tk_a': result['tk_a'], 'tk_b': result['tk_b']}, {'tk_a': result['users'][0]['tk_a'], 'tk_b': result['users'][0]['tk_b']})
 
 
 

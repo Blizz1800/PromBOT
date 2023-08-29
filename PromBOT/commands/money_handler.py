@@ -19,23 +19,31 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     # print(context.user_data['NET'])
     base = get_msg(context.user_data['NET'])
-    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
+    context.user_data['METHOD'] = data
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['BOT']
     db = get_db('static')
     db = db['referrals']
-    refs = db.find({'net': 'tlgm'})
-    if refs:
-        btns = []
+    refs = list(db.find({}))
+    # print(refs)
+    # print(len(refs))
+
+    # refs2 = db.find({})
+    if refs is not None:
+        # print('inside')
         kb = []
-        for i in refs:
-            if len(btns) >= 2:
-                kb.append(btns)
-                btns = [InlineKeyboardButton(i['name'], i['url'])]
-                continue
-            btns.append(InlineKeyboardButton(i['name'], i['url']))
-        print(btns)
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(btns), text="Estas son las redes q tenemos en este momento")
+        for i in range(0, len(refs), 2):
+            e1 = InlineKeyboardButton(refs[i]['name'], refs[i]['url'])
+            if i + 1 < len(refs):
+                e2 = InlineKeyboardButton(refs[i+1]['name'], refs[i+1]['url'])
+                kb.append([e1, e2])
+            else:
+                kb.append([e1])
+
+            # kb.append(InlineKeyboardButton(i['name'], i['url']))
+        # print(kb)
+        
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(kb), text="Estas son las redes q tenemos en este momento")
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No tenemos redes para seguir en este momento")
     try:
@@ -52,7 +60,7 @@ async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     base = get_msg(context.user_data['NET'])
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['SPAM']
-    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
+    context.user_data['METHOD'] =  data
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except Exception as e:
@@ -76,7 +84,7 @@ async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     base = get_msg(context.user_data['NET'])
     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
-    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
+    context.user_data['METHOD'] =  data
     text = base['INST']['COMENT']
 
     try:
@@ -94,13 +102,19 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['count'] = 1
     context.user_data['count'] += 1
 
+    method = context.user_data.get('METHOD', None)
+    # print('User Data: ' + str(context.user_data))
+    # print(context.user_data['METHOD'])
+    print(method)
+
     data_id = DB['requests'].insert_one(
                 {
                     "t_id": update.effective_chat.id,
                     "t_im_id": photo.file_id,
                     "t_im_uid": photo.file_unique_id,
                     "status": 0,
-                    "admin": None
+                    "admin": None,
+                    'method': method
                 }
             ).inserted_id
     context.user_data['fotos'].append([data_id, photo.file_id])
@@ -259,7 +273,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         analytics.button_press(BTS['INLINE']['REELS'], update.effective_chat.id, True)
         text = base['INST']['REELS']
         context.user_data['wa_code'] = True
-    context.bot_data[str(query.from_user.id)] = {'METHOD': data}
+    context.user_data['METHOD'] =  data
     
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
@@ -277,6 +291,7 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     admin = DB['requests'].find_one({"_id": ObjectId(_id)})
     photo = admin['t_im_id']
     user = admin['t_id']
+    method = admin['method']
     admin = admin['admin']
 
     admin = DB['users'].find_one({"t_id": admin})
@@ -319,7 +334,7 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc, "warns": warn}})
     if inc > 0 :
-        m = context.bot_data[user]['METHOD']
+        m = method
         if m == BTS['INLINE']['FOLLOW']:
             m = analytics.TK_RED.INSTAGRAM_FOLL
         elif m == BTS['INLINE']['REELS']:
