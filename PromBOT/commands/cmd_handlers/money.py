@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, constants
 from telegram.ext import ContextTypes
 from PromBOT.commands.consts import BTS
 from PromBOT.commands import DB
@@ -8,6 +8,7 @@ async def ganar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
     btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
     btns.append([BTS['BACK']])
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Elije una red para ganar dinero ;)", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True, input_field_placeholder="Red Social"))
     return 2
@@ -19,6 +20,7 @@ def update_target(t_id:int, target: str):
 async def extraer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     id = update.effective_chat.id
     me = DB['users'].find_one({"t_id": id})
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if me['target']:
         kb = ReplyKeyboardMarkup([
             [BTS['YES'], BTS['NO']],

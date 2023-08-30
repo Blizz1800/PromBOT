@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, constants
 from telegram.ext import ContextTypes
 
 from . import DB
@@ -22,6 +22,7 @@ async def get_pends(update, context, index, item, l_index=0):
         if i == "_id":
             continue
         text += "     *{}*: _{}_\n".format(i, item[i])
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(btns), parse_mode="Markdown", text=text)
     return b
 
@@ -42,6 +43,7 @@ async def get_pays(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.chat_data['pagos'] = pendientes
     pends_len = DB['pagos'].count_documents({"pagado": False})
     context.chat_data['long'] = pends_len
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if pends_len == 0:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No hay pagos pendientes")
         return

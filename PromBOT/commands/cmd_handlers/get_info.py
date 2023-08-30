@@ -1,5 +1,4 @@
-from telegram.ext import ContextTypes, ConversationHandler
-from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, constants
 from PromBOT.commands.consts import TOKEN_NAME, BTS
 from PromBOT.commands import DB
 
@@ -42,6 +41,7 @@ async def get_info(update, context):
     resp += f"_{TOKEN_NAME[1]}_: `{me['token_b']}`\n"
     
     
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if len(line_btn) > 0:
         await context.bot.send_message(chat_id=update.effective_chat.id, parse_mode="Markdown", text=resp, reply_markup=InlineKeyboardMarkup(line_btn))
     else:

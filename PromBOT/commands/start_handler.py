@@ -1,5 +1,5 @@
-from telegram.ext import ContextTypes, ConversationHandler
-from telegram import ChatInviteLink, Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ChatMemberLeft, ChatMemberBanned
+from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ChatMemberLeft, ChatMemberBanned, constants
 
 from . import analytics
 
@@ -16,6 +16,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     inGroup = not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft))
 
 
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if name is not None:
         DB['users'].update_one({'t_id': update.effective_chat.id}, {'$set': {'inGroup': inGroup}})
         if name['banned']:
@@ -56,6 +57,7 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     await query.answer()
 
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     count = DB['users'].find_one({'t_id': query.from_user.id})['inviteds']['count'] 
     group_id = '@test_blizzbot_group'
     user_in_chat = await context.bot.get_chat_member(group_id, query.from_user.id)

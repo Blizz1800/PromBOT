@@ -7,6 +7,7 @@ JR      = 1498420293
 TOKEN_NAME = ["A", "B"]
 
 GROUP_ID = '@test_blizzbot_group'
+GROUP_LINK = "https://t.me/test_blizzbot_group"
 
 STD_MK = MARKDOWN = "Markdown"
 
@@ -21,7 +22,7 @@ COMMANDS = [
     'start'
 ]
 
-CANTIDAD_EXTRAER = "De acuerdo, diga su cantidad de *{TK}* a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\nMinimo a extraer: 10{TK}"
+CANTIDAD_EXTRAER = "De acuerdo, diga su cantidad de *{TK}* a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\nMinimo a extraer: {MIN}{TK}"
 
 BTS = {
     "UPDATE": "Actualizar",
@@ -82,11 +83,66 @@ BTNS = {
     "RIFA": [
         [BTS['RIFAS']['GET'], BTS['RIFAS']['POST']],
         [BTS['BACK']]
-    ]
+    ],
+    'GRUPO':[[
+                InlineKeyboardButton(text="🥵...Ir al privado sabroso...🤤", url=GROUP_LINK)
+            ]],
+    'EXTRACT': [[BTS['CANCEL']]]
     
 }
 
 MESSAGES = {
+    "WARNS": {
+        "MSG": [
+            "Advertencia {}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal",
+            "Advertencia {}/3, hemos descontado {} de sus {}"
+        ]
+    },
+    "EXTRACT": {
+        'MARKDOWN': STD_MK,
+        "BTN": ReplyKeyboardMarkup(BTNS['EXTRACT'], True),
+        "MSG": [
+            "`{}` no es una direccion valida, por favor, introduzca una direccion a la q podamos enviar su dinero (Numero de telefono o Tarjeta de Banco)",
+            "Usted no tiene saldo suficiente para hacer la extraccion solicitada.\nSu saldo actual es de: {} {}",
+            "🥺Su solicitud esta siendo procesada por los 🤵🏻‍♂️admin, por favor espere...👨🏻‍💻",
+            'Debe tener al menos {LIMIT_B} {TK_N} para efectuar el pago\n\nEsto significa que usted debera tener en su cuenta al menos {LIMIT_B} {TK_N} para efectuar el pago.',
+            'Por favor re_introduzca su direccion de destinatario',
+            "Usted ha introducido {} como nuevo destino, este correcto?"
+        ]
+    },
+    "SEND": {
+        'MARKDOWN': STD_MK,
+        "BTN": None,
+        "MSG": [
+            "No se ha detectado una foto, por favor, reenviela",
+            "Su pago ha sido enviado a su destino, por favor espere paciente a recibirlo"
+        ]
+    },
+    "PROOFS": {
+        'MARKDOWN': STD_MK,
+        "BTN": None,
+        "MSG": [
+            "Enviadas sus pruebas a los admin, espere respuesta...",
+            "Su foto se agrego satisfactoriamente, por favor, envie {CMD} para detener el envio de fotos",
+        ]
+    },
+    'REDES': {
+        'MARKDOWN': STD_MK,
+        "MSG": [
+            "Estas son las redes q tenemos en este momento",
+            "No tenemos redes para seguir en este momento"
+        ],
+        "BTN": None
+    },
+    'GROUP': {
+        'MARKDOWN': STD_MK,
+        'BTN': BTNS['GRUPO'],
+        'MSG': [
+            "Hola {USER}, bienvenido! Pasate por mi privado si quieres hacer un dinerito extra ;)\n\n*ES GRATIS!* :D",
+            '{USER} se fue pal pingon :c',
+            'Agradecimientos especiales para `{INVITER}` por haber invitado a `{USER}` al grupo'
+            ]
+    },
     "REGLAS": {
         "MARKDOWN": STD_MK,
         "MSG": [

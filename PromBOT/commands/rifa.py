@@ -7,6 +7,7 @@ from .consts import BTS, get_msg, MARKDOWN, ADMINS
 async def base_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message.text
 
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if msg == BTS['RIFAS']['GET']:
         analytics.button_press(BTS['RIFAS']['GET'], update.effective_chat.id)
         await get_info(update, context)

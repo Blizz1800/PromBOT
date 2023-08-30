@@ -1,7 +1,7 @@
-from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, constants
 from telegram.ext import ContextTypes
 from . import DB, validate, control, analytics, get_db
-from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER
+from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER, MESSAGES
 from .cmd_handlers import net, money
 import time
 
@@ -17,7 +17,7 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     await query.answer()
-    # print(context.user_data['NET'])
+    m = MESSAGES['REDES']
     base = get_msg(context.user_data['NET'])
     context.user_data['METHOD'] = data
     analytics.button_press(data, update.effective_chat.id, True)
@@ -25,12 +25,8 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db = get_db('static')
     db = db['referrals']
     refs = list(db.find({}))
-    # print(refs)
-    # print(len(refs))
 
-    # refs2 = db.find({})
     if refs is not None:
-        # print('inside')
         kb = []
         for i in range(0, len(refs), 2):
             e1 = InlineKeyboardButton(refs[i]['name'], refs[i]['url'])
@@ -39,13 +35,10 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 kb.append([e1, e2])
             else:
                 kb.append([e1])
-
-            # kb.append(InlineKeyboardButton(i['name'], i['url']))
-        # print(kb)
         
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(kb), text="Estas son las redes q tenemos en este momento")
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=InlineKeyboardMarkup(kb), text=m['MSG'][0])
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="No tenemos redes para seguir en este momento")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][1])
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except Exception as e: 
@@ -69,6 +62,7 @@ async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return 0
 
 async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    m = MESSAGES['PROOFS']
     for i in context.user_data['fotos']:
         data_id = i[0]
         kb_admin = InlineKeyboardMarkup([[InlineKeyboardButton(BTS['INLINE']['ACCEPT'], callback_data=f"{BTS['INLINE']['ACCEPT']}2|{data_id}"), InlineKeyboardButton(BTS['INLINE']['DENY'], callback_data=f"{BTS['INLINE']['DENY']}2|{data_id}")]])
@@ -76,7 +70,7 @@ async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_photo(chat_id=a, photo=i[1], reply_markup=kb_admin)
     for i in ADMINS:
         await context.bot.send_message(chat_id=i, text="Pruebas de los comentarios del usuario `{USER}`({ID})".format(USER=update.effective_user.full_name, ID=update.effective_chat.id))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Enviadas sus pruebas a los admin, espere respuesta...")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][0])
 
 async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -118,13 +112,13 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 }
             ).inserted_id
     context.user_data['fotos'].append([data_id, photo.file_id])
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Su foto se agrego satisfactoriamente, por favor, envie /end para detener el envio de fotos")
+    m = MESSAGES['PROOFS']
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][0].format(CMD='/end'))
 
 async def envio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo
     if not photo and len(photo) <= 0:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="No se ha detectado una foto, por favor, reenviela")
-        return 1
+        return await control('SEND', update, context, 1)
 
     db_id = context.user_data['db_id']
     DB['pagos'].update_one({"_id": ObjectId(db_id)},
@@ -160,7 +154,8 @@ async def envio(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
         })
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Se esta enviando al usuario su aviso de pago, por favor esperar")
-    await context.bot.send_photo(chat_id=context.user_data['u_id'], photo=photo[-1], caption="Su pago ha sido enviado a su destino, por favor espere paciente a recibirlo")
+    m = MESSAGES['SEND']
+    await context.bot.send_photo(chat_id=context.user_data['u_id'], photo=photo[-1], caption=m['MSG'][1])
     return -1
         
 async def aviso_pago(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -192,15 +187,13 @@ async def extract(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             obj = "celular"
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="`{}` no es una direccion valida, por favor, introduzca una direccion a la q podamos enviar su dinero (Numero de telefono o Tarjeta de Banco)".format(target), reply_markup=ReplyKeyboardMarkup([[BTS['CANCEL']]], True), parse_mode='Markdown')
-        return 2
+        return await control('EXTRACT', update, context, 2, target)
     try:
         amount = int(msg)
         if me['token_b'] >= me['limit_b']:
-            # DB['users'].update_one({'t_id': id}, {'$inc': {'token_b': -amount}})
-            if (me['token_b'] - amount) >= 0:
-                await context.bot.send_message(chat_id=id, text=f"Usted no tiene saldo suficiente para hacer la extraccion solicitada.\nSu saldo actual es de: {me['token_b']} {TOKEN_NAME[1]}")
-                return -1
+            if (me['token_b'] - amount) < 0:
+                return await control('EXTRACT:2', update, context, -1, me['token_b'], TOKEN_NAME[1])
+                
             id_db= DB['pagos'].insert_one({
                 "t_id": id,
                 "time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
@@ -214,29 +207,33 @@ async def extract(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ])
             for i in ADMINS:
                 await context.bot.send_message(chat_id=i, reply_markup=btn, parse_mode="Markdown", text=f"⚠️🫣*Houston, tenemos un problema*😬⚠️\n\nEl usuario {me['name']}({me['t_id']}), ha solicitado de {amount}{TOKEN_NAME[1]} su pago hacia su {obj} `{target}`!!😱😡")
-            await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=f'🥺Su solicitud esta siendo procesada por los 🤵🏻‍♂️admin, por favor espere...👨🏻‍💻')
+            m = MESSAGES['EXTRACT']
+            await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=m['MSG'][2])
         else:
-            await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=f'Debe tener al menos {me["limit_b"]} {TOKEN_NAME[1]} para efectuar el pago\n\nEsto significa que usted debera tener en su cuenta al menos {me["limit_b"]} {TOKEN_NAME[1]} para efectuar el pago.')
+            # await control('EXTRACT:4', update, context, reply=p['BTN'], LIMIT_B=me["limit_b"], TK_N=TOKEN_NAME[1])
+            m = MESSAGES['EXTRACT']
+            await context.bot.send_message(chat_id=id, reply_markup=p['BTN'], text=m['MSG'][3].format(LIMIT_B=me['limit_b'], TK_N=TOKEN_NAME[1]))
     except ValueError as e:
-        await context.bot.send_message(chat_id=id, text=f'"{msg}" NO es un numero \n\n{e}')
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(),parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(TK=TOKEN_NAME[1]))
+        await context.bot.send_message(chat_id=id, text=f'"{msg}" NO es un numero')
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(),parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(MIN=me['limit_b'], TK=TOKEN_NAME[1]))
         return 0
     return -1
 
 async def target_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
-
+    me = DB['users'].find_one({'t_id':  update.effective_user.id})
+    m = MESSAGES['EXTRACT']
     if msg == BTS['YES']:
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(TK=TOKEN_NAME[1]))
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(MIN=me['limit_b'], TK=TOKEN_NAME[1]))
         return 0
     elif msg == BTS['NO']:
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), text="Por favor re_introduzca su direccion de destinatario")
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), text=m['MSG'][4])
         return 1
     else:
         money.update_target(update.effective_chat.id, msg)
         yes_no_kb = ReplyKeyboardMarkup([[BTS['YES'], BTS['NO']]], resize_keyboard=True)
 
-        await context.bot.send_message(update.effective_chat.id, reply_markup=yes_no_kb, text="Usted ha introducido {} como nuevo destino, este correcto?".format(msg))
+        await context.bot.send_message(update.effective_chat.id, reply_markup=yes_no_kb, text=m['MSG'][5].format(msg))
         return 1
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -357,12 +354,16 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     except Exception as e:
         print(e)
         await query.answer()
+    await context.bot.send_chat_action(user, constants.ChatAction.UPLOAD_PHOTO)
     await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{rec}")
     if not is_accept:
+        m = MESSAGES['WARNS']
         if inc >= 0:
-            await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal")
+            await context.bot.send_chat_action(user, constants.ChatAction.TYPING)
+            await context.bot.send_message(chat_id=user, text=m['MSG'][0].format(u['warns']))
         else:
-            await context.bot.send_message(chat_id=user, text=f"Advertencia {u['warns']}/3, hemos descontado {inc * -1} de sus {TOKEN_NAME[1]}")
+            await context.bot.send_chat_action(user, constants.ChatAction.TYPING)
+            await context.bot.send_message(chat_id=user, text=m['MSG'][1].format(u['warns'], inc * -1, TOKEN_NAME[1]))
     # return -1
 
 
@@ -414,15 +415,18 @@ async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except Exception as e:
         print(e)
         await query.answer()
+    await context.bot.send_chat_action(user, constants.ChatAction.TYPING)
     await context.bot.send_message(chat_id=user, text=f"Se ha {stat} su solicitud{rec}")
 
 async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     msg = update.message.text
 
+    me = DB['users'].find_one({'t_id': update.effective_user.id})
     yes_no_kb = ReplyKeyboardMarkup([[BTS['YES'], BTS['NO']]], resize_keyboard=True)
 
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     if msg == BTS['YES']:
-        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(TK=TOKEN_NAME[1]))
+        await context.bot.send_message(chat_id=update.effective_chat.id, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown", text=CANTIDAD_EXTRAER.format(MIN=me['limit_b'], TK=TOKEN_NAME[1]))
         return 0
     elif msg == BTS['NO']:
         kb = ReplyKeyboardMarkup([
@@ -442,6 +446,7 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
     btns.append([BTS['BACK']])
 
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     id = update.effective_chat.id
     msg = update.message.text
     DB['users'].update_many(
@@ -499,7 +504,7 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
                 await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*+1 {TOKEN_NAME[0]}*", parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
                 context.user_data['wa_code'] = False
             else:
-                await context.bot.send_message(chat_id=id, text="Ese codigo ya ha sido usado >:(")
+                await context.bot.send_message(chat_id=id, text="Ese codigo ya ha sido usado...!!")
                 await context.bot.send_message(chat_id=id, text=invalid['MSG'], reply_markup=invalid['BTN'], parse_mode=invalid['MARKDOWN'])
         else:
             await context.bot.send_message(chat_id=id, text="Ese codigo no existe!")
@@ -521,7 +526,7 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             return 2
         else:
             # pprint(btns)
-            await context.bot.send_message(chat_id=id, text="No photo in message", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+            await context.bot.send_message(chat_id=id, text="No se detecto ninguna foto", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
         
         context.user_data['wa_photo'] = False
 

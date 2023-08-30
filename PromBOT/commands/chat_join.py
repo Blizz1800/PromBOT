@@ -1,9 +1,9 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, ChatMemberUpdated, ChatMember
+from telegram import Update, InlineKeyboardMarkup, ChatMemberUpdated, ChatMember, constants
 from telegram.ext import ContextTypes
 # from pprint import pprint
 
 from . import DB
-from .consts import TOKEN_NAME
+from .consts import TOKEN_NAME, MESSAGES
 
 def get_status_change(update: ChatMemberUpdated):
     status = update.difference()
@@ -31,7 +31,8 @@ def get_status_change(update: ChatMemberUpdated):
 
 
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-   
+    m = MESSAGES['GROUP']
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
     result = get_status_change(update.chat_member)
     if result is None:
         return
@@ -42,15 +43,11 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     new_user = update.chat_member.new_chat_member.user
 
     if not was_member and is_member:
-        kb = InlineKeyboardMarkup(
-            [[
-                InlineKeyboardButton(text="🥵...Ir al privado sabroso...🤤", url=f"{context.bot.link}")
-            ]]
-        )
+        kb = InlineKeyboardMarkup(m['BTN'])
         incoming = new_user.full_name
         if new_user.username:
             incoming = f'@{new_user.username}'
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Hola {USER}, bienvenido! Pasate por mi privado si quieres hacer un dinerito extra ;)\n\n*ES GRATIS!* :D".format(USER=incoming), parse_mode="Markdown", reply_markup=kb)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][0].format(USER=incoming), parse_mode="Markdown", reply_markup=kb)
         if not cause.id == new_user.id:
             DB['users'].update_one(
                 {'t_id': cause.id},
@@ -88,11 +85,11 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             #         )
             #         await context.bot.send_message(chat_id=c_user['t_id'], text=f"Ha recibido *1 {TOKEN_NAME[1]}*")
             #         await context.bot.send_message(chat_id=c_user['referrer'], text=f"Usted ha recibido *2 {TOKEN_NAME[1]}*!!")
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Agradecimientos especiales para `{INVITER}` por haber invitado a `{USER}` al grupo".format(INVITER=update.chat_member.from_user.full_name, USER=incoming))
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][2].format(INVITER=update.chat_member.from_user.full_name, USER=incoming))
 
     elif was_member and not is_member:
         outgoing = new_user.full_name
         if new_user.username:
             outgoing = f'@{new_user.username}'
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='{USER} se fue pal pingon :c'.format(USER=outgoing))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][1].format(USER=outgoing))
     

@@ -23,7 +23,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                     referir = True
                     for i in referral['referrals']:
                         if i == id:
-                            await context.bot.send_message(chat_id=id, text=f"You have already referred to this one")
+                            await context.bot.send_message(chat_id=id, text=f"Ya has sido referido a este usuario")
                             referir = False
                             break
                     if referir:
