@@ -40,12 +40,12 @@ BTS = {
     "MONEY": {
         "KEY": "Dinero",
         "GET": "Extraer Dinero",
-        "POST": "Ganar Dinero"
+        "POST": "Ganar Dinero 💸"
     },
     "INLINE": {
         "ACTIVATE": "Activarme",
-        "SUB": "Subscripciones",
-        "CODE": "Insertar Codigo",
+        "SUB": "Subscribirse📲",
+        "CODE": "Escribir código ✍🏻",
         "COMENT": "Comentarios",
         "ACCEPT": "Aceptar",
         "DENY": "Banear",
@@ -59,7 +59,7 @@ BTS = {
     },
     "NET": {
         "IG": "Instagram",
-        "YT": "YouTube",
+        "YT": "Youtube 🎞",
         "TLGM": "Telegram",
         "WHTS": "Whatsapp"
     },
@@ -153,7 +153,7 @@ MESSAGES = {
     "START": {
         "MARKDOWN": None,
         "MSG": [
-            "Bienvenido {user}!\nQue desea?",
+            "Bienvenido {user}, soy PromBOT 🖲 ¿En qué te puedo ayudar? 👀👇🏻\nAquí están mis comandos📃\n.Te ayudaremos a ganar dinero💵 y seguidores👥.",
             "Bienvenido de vuelta, {user}!\nQue desea?",
             "No se reconoce su entrada"
         ],
@@ -161,11 +161,11 @@ MESSAGES = {
     },
     "YT": {
         "MARKDOWN": None,
-        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "MSG": ["Por favor, elija una de las siguientes opciones y le dare las instrucciones de q hacer"],
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['SUB'], callback_data=BTS['INLINE']['SUB']),InlineKeyboardButton(text=BTS['INLINE']['CODE'], callback_data=BTS['INLINE']['CODE'])]]),
         "INST": {
-            "SUB": "Mensaje de instrucciones para cuando se quiera ganar con subs",
-            "CODE": "Mensaje de instrucciones para cuando se quiera ganar con codigos"
+            "SUB": f"Para empezar a ganar dinero 💵 deberás subscribirte🔔 y subir una captura de pantalla📱 para verificar que has realizado la acción✅.\n\nEl bot 🖲lo revisará.\n\nLa recompensa 🪙 por subscribirse es un {TOKEN_NAME[1]} ",
+            "CODE": f"En los videos 🖥 aparecen diversos códigos ⭕️ como se ven en las siguientes imágenes.\n\nDebes escribirlos ✍🏻 para recibir 🪙 un {TOKEN_NAME[0]} por código."
         }
     },
     "IG": {

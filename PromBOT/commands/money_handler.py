@@ -494,13 +494,14 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             return 2
         if DB['codes'].find_one({'code': msg}):
             if DB['users'].find_one({"$and":[{"t_id": id}, {"codes": {"$elemMatch": {"$eq": msg}}}]}):
-                a = DB['users'].update_one(
+
+                DB['users'].update_one(
                     {"$and":[{"t_id": id}, {"codes": {"$elemMatch": {"$eq": msg}}}]},
                     {"$unset": {"codes.$[i]": ""}, "$inc": {"token_a": 1}},
                     array_filters=[{"i": {"$eq": msg}}])
     
                 msg = get_msg('NO_CODE')['MSG']
-                
+                analytics.earn_tk(analytics.TK_RED.YOUTUBE_CODES, id, 1, analytics.TK.A)
                 await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*+1 {TOKEN_NAME[0]}*", parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
                 context.user_data['wa_code'] = False
             else:
