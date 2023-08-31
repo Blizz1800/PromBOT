@@ -101,7 +101,10 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             if many > 0:
                 bono = f"\n\n😱Ha recibido un bono de: {many} {TOKEN_NAME[1]}💸"
+            else:
+                bono = ""
             txt = "🎊Usted ya es un usuario activo🎉\nDisfrute de su subscripcion😊{BONO}".format(BONO=bono)
+            kb = InlineKeyboardMarkup([[]])
         else:
             txt = "Usted debe agregar aun {MANY} mas usuarios al grupo {ID}, ha agregado {COUNT}/5"
     else:
@@ -109,8 +112,8 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await query.edit_message_text(reply_markup=kb, text=txt.format(ID=group_id, MANY=5-count, COUNT=count))
     except Exception as e:
-        # print(e)
-        query.answer()
+        print(e)
+        await query.answer()
 
 
 async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -127,7 +130,7 @@ async def activate_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [[InlineKeyboardButton(BTS['INLINE']['UPDATE'], callback_data=BTS['INLINE']['UPDATE'])]]
     )
 
-    txt = "Usted debe ingresar al grupo {ID} y agregar {MANY} usuarios mas\n\nUsuarios agregados: {COUNT}/5"
+    txt = "Usted debe ingresar al grupo📥 {ID} y agregar {MANY} suarios 👤más \n\n👤Usuarios agregados: {COUNT}/5"
     try:
         await query.edit_message_text(reply_markup=kb, text=txt.format(ID=group_id, MANY=5-count, COUNT=count))
     except Exception as e:

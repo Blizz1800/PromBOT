@@ -3,6 +3,9 @@ from telegram.ext import ContextTypes
 
 from PromBOT.commands import DB, consts, control
 
+async def more_ways(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await control('MORE_WAYS', update=update, context=context)
+
 async def tlgm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await control('TLGM', update=update, context=context)
 

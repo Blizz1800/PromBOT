@@ -7,10 +7,11 @@ async def ganar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     btns = []
     btns.append([BTS['NET']['YT'], BTS['NET']['IG']])
     btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
+    btns.append([BTS['MORE_WAYS']])
     btns.append([BTS['BACK']])
     await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="""Poseemos dos tipos de moneda: {A} y {B}. La moneda {B} consta de 17 {A} y esta {B} es intercambiable por 1 peso cubano 🪙, directo a la tarjeta bancaria 💳 o recarga al móvil 📲.En un futuro podremos cambiarlo en otros tipos de moneda 🪙 como MLC💶, USD💷 para que se puedan realizar compras en el exterior 💳.\nSeleccione una plataforma👇🏻""".format(A=TOKEN_NAME[0], B=TOKEN_NAME[1]), reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True, input_field_placeholder="Red Social"))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="""Poseemos dos tipos de moneda: {A} y {B}. La moneda {B} consta de 17 {A} y esta {B} es intercambiable por 1 peso cubano 🪙, directo a la tarjeta bancaria 💳 o recarga al móvil 📲.En un futuro podremos cambiarlo en otros tipos de moneda 🪙 como MLC💶, USD💷 para que se puedan realizar compras en el exterior 💳.\n\nPor favor, elija la plataforma que mas familiarizado este con ellay siga las instrucciones para comenzar a ganar👇🏻\n(Recomendamos usar WiFi)""".format(A=TOKEN_NAME[0], B=TOKEN_NAME[1]), reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True, input_field_placeholder="Red Social"))
     return 2
 
 def update_target(t_id:int, target: str):

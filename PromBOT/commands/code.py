@@ -18,10 +18,6 @@ async def gen_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             await context.bot.send_message(chat_id=update.effective_chat.id, text=p['MSG'], reply_markup=p['BTN'], parse_mode=p['MARKDOWN'])
             return -1
         DB['users'].update_many({'codes': {'$exists': False}}, {'$set': {'codes': []}})
-        # if DB['codes'].find_one({'code': {'$exists': True}}) is None:
-        #     DB['codes'].insert_one({
-        #         'code': 
-        #         })
         try:
             LEN = update.message.text
             c_len = 3

@@ -9,7 +9,7 @@ async def get_referidos(update, context) -> int:
         [BTS['REFERIDOS']['GET'], BTS['REFERIDOS']['POST']],
         [BTS['BACK']]
     ]
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Encantado! Que clase de informacion necesita?", reply_markup=ReplyKeyboardMarkup(bts, resize_keyboard=True))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Encantado! Qué clase de información necesita?👁‍🗨", reply_markup=ReplyKeyboardMarkup(bts, resize_keyboard=True))
     return 1
 async def get_referidosV2(update, context):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)

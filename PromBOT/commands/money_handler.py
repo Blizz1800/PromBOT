@@ -1,9 +1,12 @@
 from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, constants
 from telegram.ext import ContextTypes
 from . import DB, validate, control, analytics, get_db
-from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER, MESSAGES
+from .consts import BTS, get_msg, ADMINS, TOKEN_NAME, ADMINS, CANTIDAD_EXTRAER, MESSAGES, MARKDOWN
 from .cmd_handlers import net, money
 import time
+import random
+
+from datetime import date
 
 from pprint import pprint
 
@@ -29,6 +32,8 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if refs is not None:
         kb = []
         for i in range(0, len(refs), 2):
+            if not i['net'] == 'Telegram':
+                continue
             e1 = InlineKeyboardButton(refs[i]['name'], refs[i]['url'])
             if i + 1 < len(refs):
                 e2 = InlineKeyboardButton(refs[i+1]['name'], refs[i+1]['url'])
@@ -46,16 +51,34 @@ async def tlgm_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
     return 0
 
+
+def get_spam():
+    db = get_db('static')
+    spam = list(db['spam'].find({}))
+    # print(spam)
+    return sorted(spam, key=lambda x: x['priority'], reverse=True)
+
+async def spam_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
+    await context.bot.send_message(update.effective_chat.id, 'Operacion cancelada')
+    return -1
+
 async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     await query.answer()
     base = get_msg(context.user_data['NET'])
+    # print('aaaaaaaaaa')
     analytics.button_press(data, update.effective_chat.id, True)
     text = base['INST']['SPAM']
     context.user_data['METHOD'] =  data
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
+        # print(get_spam())
+        for i in get_spam():
+            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
+            await context.bot.send_message(update.effective_chat.id, i['msg'])
+        
     except Exception as e:
         print(e)
         await query.answer()
@@ -75,16 +98,19 @@ async def ig_end(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ig_comments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
+    db = get_db('static')
     await query.answer()
     base = get_msg(context.user_data['NET'])
     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
     context.user_data['METHOD'] =  data
     text = base['INST']['COMENT']
-
+    pub = random.choice(list(db['instagram'].find({'kind': 0})))
+    kb = [[InlineKeyboardButton(pub['name'], pub['link'])]]
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Estas son las publicaciones a las q debes acceder:", reply_markup=InlineKeyboardMarkup(kb))
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
     except Exception as e:
-        print(e)
+        # print(e)
         await query.answer()
     return 0
 
@@ -99,7 +125,7 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     method = context.user_data.get('METHOD', None)
     # print('User Data: ' + str(context.user_data))
     # print(context.user_data['METHOD'])
-    print(method)
+    # print(method)
 
     data_id = DB['requests'].insert_one(
                 {
@@ -243,39 +269,73 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     data = query.data
     await query.answer()
+    db = get_db('static')
     base = get_msg(context.user_data['NET'])    # Selecciona Youtube o Instagram automaticamente
     # print(base)
     #   YOUTUBE
     if data == BTS['INLINE']['SUB']:
         analytics.button_press(BTS['INLINE']['UPDATE'], update.effective_chat.id, True)
-        
         text = base['INST']['SUB']
-        
+        red = 1
         context.user_data['wa_photo'] = True
     elif data == BTS['INLINE']['CODE']:
         analytics.button_press(BTS['INLINE']['CODE'], update.effective_chat.id, True)
         text = base['INST']['CODE']
         context.user_data['wa_code'] = True
+        red = 4
     #   INSTAGRAM
-    # elif data == BTS['INLINE']['COMENT']:
-    #     analytics.button_press(BTS['INLINE']['COMENT'], update.effective_chat.id, True)
-    #     text = base['INST']['COMENT']
-    #     wa_photo = True
-    #     wa_many = False
     elif data == BTS['INLINE']['FOLLOW']:
         analytics.button_press(BTS['INLINE']['FOLLOW'], update.effective_chat.id, True)
         text = base['INST']['FOLLOW']
         context.user_data['wa_photo'] = True
+        red = 2
     elif data == BTS['INLINE']['REELS']:
         analytics.button_press(BTS['INLINE']['REELS'], update.effective_chat.id, True)
         text = base['INST']['REELS']
         context.user_data['wa_code'] = True
+        red = 3
     context.user_data['METHOD'] =  data
     
     try:
         await query.edit_message_text(text=text, parse_mode=base['MARKDOWN'], reply_markup=base['BTN'])
+        if red == 1:
+            chanels = list(db['youtube'].find({'kind': 1}))
+            kb = []
+            for i in chanels:
+                kb.append([InlineKeyboardButton(i['name'], i['link'])])
+            if len(kb) > 0:
+                await context.bot.send_message(update.effective_chat.id, "Aqui les presentamos la lista de canales📂 para suscribirse📲:", reply_markup=InlineKeyboardMarkup(kb))
+            else: 
+                await context.bot.send_message(update.effective_chat.id, "No tenemos canales disponibles en estos momentos", reply_markup=InlineKeyboardMarkup(kb))
+        elif red == 2:
+            chanels = list(db['instagram'].find({'kind': 1}))
+            kb = []
+            for i in chanels:
+                kb.append([InlineKeyboardButton(i['name'], i['link'])])
+            if len(kb) > 0:
+                await context.bot.send_message(update.effective_chat.id, "Aqui les presentamos la lista de cuentas para seguir:", reply_markup=InlineKeyboardMarkup(kb))
+            else:
+                await context.bot.send_message(update.effective_chat.id, "No tenemos cuentas disponibles en estos momentos", reply_markup=InlineKeyboardMarkup(kb))
+        elif red == 3:
+            chanels = list(db['instagram'].find({'kind': 2}))
+            kb = []
+            for i in chanels:
+                kb.append([InlineKeyboardButton(i['name'], i['link'])])
+            if len(kb) > 0:
+                await context.bot.send_message(update.effective_chat.id, "Aqui les presentamos la lista de publicaciones para encontrar codigos:", reply_markup=InlineKeyboardMarkup(kb))
+            else:
+                await context.bot.send_message(update.effective_chat.id, "❌No tenemos publicaciones 📤 en estos momentos 👁‍🗨", reply_markup=InlineKeyboardMarkup(kb))
+        elif red == 4:
+            chanels = list(db['youtube'].find({'kind': 0}))
+            kb = []
+            for i in chanels:
+                kb.append([InlineKeyboardButton(i['name'], i['link'])])
+            if len(kb) > 0:
+                await context.bot.send_message(update.effective_chat.id, "Aqui les presentamos la lista de videos para encontrar codigos:", reply_markup=InlineKeyboardMarkup(kb))
+            else:
+                await context.bot.send_message(update.effective_chat.id, "❌No tenemos videos 🖥en estos momentos 👁‍🗨", reply_markup=InlineKeyboardMarkup(kb))
     except Exception as e:
-        print(e)
+        # print(e)
         await query.answer()
 
 async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -329,7 +389,8 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         }
     )
 
-    DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc, "warns": warn}})
+    DB['users'].update_one({"t_id": user}, {"$inc": {"token_a": inc, "warns": warn}})
+
     if inc > 0 :
         m = method
         if m == BTS['INLINE']['FOLLOW']:
@@ -342,12 +403,15 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             m = analytics.TK_RED.YOUTUBE_CODES
         elif m == BTS['INLINE']['SUB']:
             m = analytics.TK_RED.YOUTUBE_SUB
-        analytics.earn_tk(m, user, inc, analytics.TK.B)
+        analytics.earn_tk(m, user, inc, analytics.TK.A)
+
     if status > 0:
         stat = "aceptado"
+        emoji = '✨'
         rec = f". Ha recibido *+{inc} {TOKEN_NAME[1]}*"
     else:
         stat = "denegado"
+        emoji = '😢'
         rec = "."
     try:
         await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
@@ -355,7 +419,7 @@ async def admin_btn_v2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         print(e)
         await query.answer()
     await context.bot.send_chat_action(user, constants.ChatAction.UPLOAD_PHOTO)
-    await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{rec}")
+    await context.bot.send_photo(chat_id=user, photo=photo, caption=f"Se ha {stat} su foto{emoji}{rec}", parse_mode=MARKDOWN)
     if not is_accept:
         m = MESSAGES['WARNS']
         if inc >= 0:
@@ -375,6 +439,7 @@ async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     admin = DB['requests'].find_one({"_id": ObjectId(_id)})
     user = admin['t_id']
+    method = admin['method']
     admin = admin['admin']
 
     admin = DB['users'].find_one({"t_id": admin})
@@ -403,20 +468,35 @@ async def admin_btn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             }
         }
     )
-    DB['users'].update_one({"t_id": user}, {"$inc": {"token_b": inc}, "$set":{"banned": ban}})
+    # analytics.earn_tk(analytics.TK_RED.)
+    DB['users'].update_one({"t_id": user}, {"$inc": {"token_a": inc}, "$set":{"banned": ban}})
+    if inc > 0 :
+        m = method
+        if m == BTS['INLINE']['FOLLOW']:
+            m = analytics.TK_RED.INSTAGRAM_FOLL
+        elif m == BTS['INLINE']['REELS']:
+            m = analytics.TK_RED.INSTAGRAM_REEL
+        elif m == BTS['INLINE']['COMENT']:
+            m = analytics.TK_RED.INSTAGRAM_COM
+        elif m == BTS['INLINE']['CODE']:
+            m = analytics.TK_RED.YOUTUBE_CODES
+        elif m == BTS['INLINE']['SUB']:
+            m = analytics.TK_RED.YOUTUBE_SUB
+        analytics.earn_tk(m, user, inc, analytics.TK.A)
+
     if status > 0:
         stat = "aceptado"
-        rec = f". Ha recibido *+{inc} {TOKEN_NAME[1]}*"
+        rec = f". Ha recibido *+{inc} {TOKEN_NAME[0]}*"
     else:
         stat = "denegado"
         rec = "."
     try:
         await query.edit_message_caption(f"Usted ha {stat} esta solicitud")
     except Exception as e:
-        print(e)
+        # print(e)
         await query.answer()
     await context.bot.send_chat_action(user, constants.ChatAction.TYPING)
-    await context.bot.send_message(chat_id=user, text=f"Se ha {stat} su solicitud{rec}")
+    await context.bot.send_message(chat_id=user, text=f"Se ha {stat} su solicitud{rec}", parse_mode=MARKDOWN)
 
 async def extract_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     msg = update.message.text
@@ -472,6 +552,10 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         context.user_data['NET'] = 'WHTS'
         context.user_data['reset'] = True
         await net.whts(update, context)
+    elif msg == BTS['MORE_WAYS']:
+        context.user_data['NET'] = 'WHTS'
+        context.user_data['reset'] = True
+        await net.more_ways(update, context)
     elif msg == BTS['BACK']:
         context.user_data['reset'] = True
         return await control('START:2', update, context)
@@ -497,12 +581,12 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
                 DB['users'].update_one(
                     {"$and":[{"t_id": id}, {"codes": {"$elemMatch": {"$eq": msg}}}]},
-                    {"$unset": {"codes.$[i]": ""}, "$inc": {"token_a": 1}},
+                    {"$unset": {"codes.$[i]": ""}, "$inc": {"token_b": 1}},
                     array_filters=[{"i": {"$eq": msg}}])
     
                 msg = get_msg('NO_CODE')['MSG']
-                analytics.earn_tk(analytics.TK_RED.YOUTUBE_CODES, id, 1, analytics.TK.A)
-                await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*+1 {TOKEN_NAME[0]}*", parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+                analytics.earn_tk(analytics.TK_RED.YOUTUBE_CODES, id, 1, analytics.TK.B)
+                await context.bot.send_message(chat_id=id, text=f"Usted ha enviado su código correctamente\n*+1 {TOKEN_NAME[1]}*", parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
                 context.user_data['wa_code'] = False
             else:
                 await context.bot.send_message(chat_id=id, text="Ese codigo ya ha sido usado...!!")

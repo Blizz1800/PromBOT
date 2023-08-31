@@ -19,6 +19,8 @@ class TK(Enum):
 
 def earn_tk(tk_red: TK_RED, uid: int | str, many: int, tk: TK = TK.B):
     global DB
+    tk_red = tk_red.value
+    tk = tk.value
     target_db = DB['tokens']
     if not target_db.find_one({'red': tk_red}):
         target_db.insert_one({
@@ -36,9 +38,9 @@ def earn_tk(tk_red: TK_RED, uid: int | str, many: int, tk: TK = TK.B):
     if not target_db.find_one({ 'red': tk_red, "users.uid": uid }):
         target_db.update_one({ 'red': tk_red,}, {"$push": {'users': {'uid': uid, 'tk_a': 0, 'tk_b': 0}}})
     
-    print(f'TK_RED: {tk_red}')
-    tk = '_'.join(str(tk).lower().split('.'))
-    print(f'TK: {str(tk)}')
+    # print(f'TK_RED: {tk_red}')
+    # tk = '_'.join(str(tk).lower().split('.'))
+    # print(f'TK: {str(tk)}')
     
 
     target_db.update_one(

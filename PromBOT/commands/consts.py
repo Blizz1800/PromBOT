@@ -11,6 +11,9 @@ GROUP_LINK = "https://t.me/test_blizzbot_group"
 
 STD_MK = MARKDOWN = "Markdown"
 
+BOT_NAME = "PromBOT"
+
+STD_NET = "Por favor, elija una de las siguientes opciones y le dare las instrucciones de q hacer"
 
 ADMINS = [
     BLIZZ,
@@ -32,6 +35,7 @@ BTS = {
     "FOLLOWERS": "Obtener Seguidores",
     "BACK": "Volver",
     "REGLAS": "🗣️📣Reglas📑",
+    "MORE_WAYS": "Mas Opciones",
     "REFERIDOS": {
         "KEY": "Referidos",
         "GET": "Ver Referidos",
@@ -46,11 +50,11 @@ BTS = {
         "ACTIVATE": "Activarme",
         "SUB": "Subscribirse📲",
         "CODE": "Escribir código ✍🏻",
-        "COMENT": "Comentarios",
+        "COMENT": "Comentar",
         "ACCEPT": "Aceptar",
         "DENY": "Banear",
-        "FOLLOW": "Siguiendo",
-        "REELS": "Ver Reels",
+        "FOLLOW": "Seguir",
+        "REELS": "Escribir código✍🏻",
         "PAGO": "Avisar de pago",
         "MORE": "🥲Mostrar mas💸",
         "UPDATE": "Actualizar informacion",
@@ -94,7 +98,7 @@ BTNS = {
 MESSAGES = {
     "WARNS": {
         "MSG": [
-            "Advertencia {}/3, a partir de la 3era comenzaremos a descontar tokens\n\nLos posibles motivos por los q se haya rechazado su prueba, pueden verlos pulsando -> /rules <- o mirando el apartado de \"reglas\" en el menu principal",
+            "🪬Advertencia {}/3, a partir de la 3era comenzaremos a descontar tokens❌🏆\n\nLos posibles motivos por los q se haya rechazado🪬su prueba 📧, pueden verlos pulsando 👉 /rules 👈 o mirando el apartado de \"reglas\"📋 en el menú principal🗄",
             "Advertencia {}/3, hemos descontado {} de sus {}"
         ]
     },
@@ -122,8 +126,8 @@ MESSAGES = {
         'MARKDOWN': STD_MK,
         "BTN": None,
         "MSG": [
-            "Enviadas sus pruebas a los admin, espere respuesta...",
-            "Su foto se agrego satisfactoriamente, por favor, envie {CMD} para detener el envio de fotos",
+            "Enviadas sus pruebas 📪a los admin, espere 👁‍🗨 respuesta…. ",
+            "Su foto 🌁 se agrego 📲satisfactoriamente👌, por favor, envie 👉🏻{CMD} para detener el envio de fotos🪬",
         ]
     },
     'REDES': {
@@ -154,50 +158,55 @@ MESSAGES = {
         "MARKDOWN": None,
         "MSG": [
             "Bienvenido {user}, soy PromBOT 🖲 ¿En qué te puedo ayudar? 👀👇🏻\nAquí están mis comandos📃\n.Te ayudaremos a ganar dinero💵 y seguidores👥.",
-            "Bienvenido de vuelta, {user}!\nQue desea?",
-            "No se reconoce su entrada"
+            "Bienvenido de vuelta🖲, {user}!\nQué desea?👁‍🗨",
+            "❌No se reconoce su entrada 📲"
         ],
         "BTN": BTNS['START']
     },
     "YT": {
         "MARKDOWN": None,
-        "MSG": ["Por favor, elija una de las siguientes opciones y le dare las instrucciones de q hacer"],
+        "MSG": [STD_NET],
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['SUB'], callback_data=BTS['INLINE']['SUB']),InlineKeyboardButton(text=BTS['INLINE']['CODE'], callback_data=BTS['INLINE']['CODE'])]]),
         "INST": {
             "SUB": f"Para empezar a ganar dinero 💵 deberás subscribirte🔔 y subir una captura de pantalla📱 para verificar que has realizado la acción✅.\n\nEl bot 🖲lo revisará.\n\nLa recompensa 🪙 por subscribirse es un {TOKEN_NAME[1]} ",
-            "CODE": f"En los videos 🖥 aparecen diversos códigos ⭕️ como se ven en las siguientes imágenes.\n\nDebes escribirlos ✍🏻 para recibir 🪙 un {TOKEN_NAME[0]} por código."
+            "CODE": f"En los videos 🖥 aparecen diversos códigos ⭕️ en la parte inferior derecha del video.\n\nDebes escribirlos ✍🏻 para recibir 🪙 un {TOKEN_NAME[1]} por código."
         }
     },
     "IG": {
         "MARKDOWN": None,
-        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "MSG": [STD_NET],
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['FOLLOW'], callback_data=BTS['INLINE']['FOLLOW']),InlineKeyboardButton(text=BTS['INLINE']['REELS'], callback_data=BTS['INLINE']['REELS'])], [InlineKeyboardButton(BTS['INLINE']['COMENT'], callback_data=BTS['INLINE']['COMENT'])]]),
         "INST": {
-            "FOLLOW": "Mensaje de instrucciones para cuando se quiera ganar con seguimiento",
-            "REELS": "Mensaje de instrucciones para cuando se quiera ganar viendo reels",
-            "COMENT": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
+            "FOLLOW": "Siga las siguientes cuentas de instagram y suba una captura para probar su validez, una ves haya verificado esto, se le informara.",
+            "REELS": "Los siguientes reels de instagram tienen códigos ⭕️ en algún punto del video 🖥, escríbalo ✍🏻 según lo encuentre para ganar tokens🏆",
+            "COMENT": "Comenta y dale LIKE a este reel/post de instagram y toma una captura de pantalla, una vez hecho esto, sube la captura y el bot procedera a validarla"
         }
     },
     "TLGM": {
-        "MARKDOWN": None,
-        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "MARKDOWN": STD_MK,
+        "MSG": [STD_NET],
         "BTN": InlineKeyboardMarkup([[
             InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM']), InlineKeyboardButton(BTS['INLINE']['BOT'], callback_data=BTS['INLINE']['BOT'])
         ]]),
         "INST": {
             "BOT": "Mensaje de instrucciones para cuando se quiera ganar con BOTs",
-            "SPAM": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
+            "SPAM": "Usted debera compartir las siguientes publicaciones en diferentes grupos _cada uno con mas de_ *150* _usuarios_ y pasar captura de su publicacion y la cantidad de miembros q tenga el grupo, o de preferencia, una captura donde se pueda visualizar ambas coasas, una vez el bot haya validado sus fotos, recibira un mensaje de respuesta avisandole, por favor envie varias fotos como prueba de sus publicaciones"
         }
     },
     "WHTS": {
-        "MARKDOWN": None,
-        "MSG": ["Mensaje que despues @JRMast me debe dar"],
+        "MARKDOWN": STD_MK,
+        "MSG": [STD_NET],
         "BTN": InlineKeyboardMarkup([[
             InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM'])
         ]]),
         "INST": {
-            "SPAM": "Mensaje de instrucciones para cuando se quiera ganar con comentarios, por favor envie varias fotos como prueba de sus publicaciones"
+            "SPAM": "Usted debera compartir las siguientes publicaciones en diferentes grupos _cada uno con mas de_ *150* _usuarios_ y pasar captura de su publicacion y la cantidad de miembros q tenga el grupo, o de preferencia, una captura donde se pueda visualizar ambas coasas, una vez el bot haya validado sus fotos, recibira un mensaje de respuesta avisandole, por favor envie varias fotos como prueba de sus publicaciones"
         }
+    },
+    "MORE_WAYS": {
+        "MARKDOWN": STD_MK,
+        "MSG": [f"Otras formas de ganar es invitando usuarios a usar el bot, ¿Como? ¡Pues facil! Usted debera ir a su apartado de referidos y darle invitar, recibira un link de referido, el cual debera compartir con sus amigos y familiares para q estos se refieran a usted, ganara 1 {TOKEN_NAME[1]} por cada referido y sus invitados entraran con 2 {TOKEN_NAME[1]}, ¡Todos Ganan usando {BOT_NAME}!"],
+        "BTN": None
     },
     "INVALID_CODE": {
         "MARKDOWN": None,
@@ -211,7 +220,7 @@ MESSAGES = {
     },
     "RIFAS": {
         "MARKDOWN": None,
-        "MSG": ["Veo q estas interesado en las rifas, que bien!!"],
+        "MSG": ["👁‍🗨Veo que estas interesado en las rifas💎, que bien!!"],
         "BTN": ReplyKeyboardMarkup(BTNS['RIFA'], resize_keyboard=True)
     }
 }

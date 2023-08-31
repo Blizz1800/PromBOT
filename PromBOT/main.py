@@ -18,9 +18,9 @@ code = ConversationHandler(
                 per_user=True,
                 entry_points=[CommandHandler('code', code.gen_msg)],
                 states={
-                    0: [MessageHandler(TEXT & COMMAND, code.gen_code)]
+                    0: [MessageHandler(TEXT | COMMAND, code.gen_code)]
                 },
-                fallbacks=[lambda update, context: print('No se encontró el código')],
+                fallbacks=[],
             )
 
 entry = ConversationHandler(
@@ -64,7 +64,7 @@ HANDLERS = [
     ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.tlgm_spam, pattern=consts.BTS['INLINE']['SPAM']),CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT'])],
         states={
-            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end), CallbackQueryHandler(money_handler.tlgm_spam, pattern=consts.BTS['INLINE']['SPAM']),CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT'])]
         },
         fallbacks=[],
         per_user=True,
