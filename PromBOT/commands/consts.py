@@ -4,16 +4,24 @@ BLIZZ   = 1287864142
 YUNIOR  = 819480320
 JR      = 1498420293
 
-TOKEN_NAME = ["A", "B"]
+SPECIAL_CHARS = ['_', '*', '`', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+
+TOKEN_NAME = ["🪙", "💎"]
 
 GROUP_ID = '@test_blizzbot_group'
 GROUP_LINK = "https://t.me/test_blizzbot_group"
 
+BOT_LINK = "https://t.me/test_promblizzbot?start"
+
 STD_MK = MARKDOWN = "Markdown"
+
+SPAM_MSG = "Usted debera compartir 🔀 las siguientes publicaciones 📳 en diferentes grupos 👥 _cada uno con mas de_ *150* 👤 _usuarios_ y pasar captura 🖼️ de su publicacion y la cantidad de miembros 👥 que tenga el grupo, o de preferencia, una captura donde se pueda visualizar ambas coasas😁👌, una vez el bot 🤖 haya validado sus fotos🔎, recibira un mensaje 📩 de respuesta avisandole, por favor envie varias fotos 📸 como prueba de sus publicaciones😊👍"
 
 BOT_NAME = "PromBOT"
 
-STD_NET = "Por favor, elija una de las siguientes opciones y le dare las instrucciones de q hacer"
+STD_NET = "Por favor, elija una de las siguientes opciones🔖 y le daré las instrucciones📄 de que hacer"
+
+BUILDING = "🚧Under Construction!!🚧"
 
 ADMINS = [
     BLIZZ,
@@ -25,26 +33,26 @@ COMMANDS = [
     'start'
 ]
 
-CANTIDAD_EXTRAER = "De acuerdo, diga su cantidad de *{TK}* a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\nMinimo a extraer: {MIN}{TK}"
+CANTIDAD_EXTRAER = "😁👍De acuerdo, diga su cantidad de *{TK}* 💵 a extraer\n\n~ 1{TK} = 1 CUP\n~ 10{TK} = 10 CUP\n\n⚠️❗Minimo a extraer: {MIN}{TK}❗⚠️\n\nSaldo actual: {MANY}{TK}"
 
 BTS = {
-    "UPDATE": "Actualizar",
-    "YES": "Si, es esta!",
-    "NO": "No, no lo es",
-    "INVITE": "Invitar a...",
-    "FOLLOWERS": "Obtener Seguidores",
-    "BACK": "Volver",
+    "UPDATE": "Actualizar♻️",
+    "YES": "Si, es esta!😃",
+    "NO": "No, no lo es😒",
+    "INVITE": "📨Invitar a...",
+    "FOLLOWERS": "Obtener Seguidores👥",
+    "BACK": "🔙Volver",
     "REGLAS": "🗣️📣Reglas📑",
-    "MORE_WAYS": "Mas Opciones",
+    "MORE_WAYS": "⚠️Mas Opciones⚠️",
     "REFERIDOS": {
-        "KEY": "Referidos",
-        "GET": "Ver Referidos",
-        "POST": "Invitar Referidos"
+        "KEY": "👤Referidos👥",
+        "GET": "👥Ver Referidos👀",
+        "POST": "📎Invitar Referidos🖇️"
     },
     "MONEY": {
-        "KEY": "Dinero",
-        "GET": "Extraer Dinero",
-        "POST": "Ganar Dinero 💸"
+        "KEY": "💹Dinero💸",
+        "GET": "🏦Extraer Dinero🧾",
+        "POST": "🪙Ganar Dinero💰"
     },
     "INLINE": {
         "ACTIVATE": "Activarme",
@@ -59,21 +67,23 @@ BTS = {
         "MORE": "🥲Mostrar mas💸",
         "UPDATE": "Actualizar informacion",
         "BOT": "Bots",
-        "SPAM": "Publicaciones"
+        "SPAM": "Publicaciones",
+        "SEND_PHOTO": "😶¿Como hago esto?🤔",
+        "REMOVE": "❌Borrar Entrada🚮"
     },
     "NET": {
-        "IG": "Instagram",
-        "YT": "Youtube 🎞",
-        "TLGM": "Telegram",
-        "WHTS": "Whatsapp"
+        "IG": "Instagram 🟪",
+        "YT": "Youtube 🔴",
+        "TLGM": "Telegram 🔵",
+        "WHTS": "Whatsapp 🟩"
     },
     "RIFAS": {
-        "KEY": "Rifas",
-        "GET": "Obtener Informacion",
-        "POST": "Participar en Rifa"
+        "KEY": "Rifas🔊",
+        "GET": "Obtener Informacion📩",
+        "POST": "Participar en Rifa🏷️"
     },
-    "NO_CODE": "No Tengo un Codigo :(",
-    "CANCEL": "Cancelar"
+    "NO_CODE": "No Tengo un Codigo 😢",
+    "CANCEL": "🚫Cancelar🚫"
 }
 
 BTNS = {
@@ -89,7 +99,7 @@ BTNS = {
         [BTS['BACK']]
     ],
     'GRUPO':[[
-                InlineKeyboardButton(text="🥵...Ir al privado sabroso...🤤", url=GROUP_LINK)
+                InlineKeyboardButton(text="🤖Ir al Privado!😉", url=BOT_LINK)
             ]],
     'EXTRACT': [[BTS['CANCEL']]]
     
@@ -98,7 +108,7 @@ BTNS = {
 MESSAGES = {
     "WARNS": {
         "MSG": [
-            "🪬Advertencia {}/3, a partir de la 3era comenzaremos a descontar tokens❌🏆\n\nLos posibles motivos por los q se haya rechazado🪬su prueba 📧, pueden verlos pulsando 👉 /rules 👈 o mirando el apartado de \"reglas\"📋 en el menú principal🗄",
+            "🪬Advertencia {}/3, a partir de la 3era comenzaremos a descontar tokens❌🏆\n\nLos posibles motivos por los que se haya rechazado🪬su prueba 📧, pueden verlos pulsando 👉 /rules 👈 o mirando el apartado de \"reglas\"📋 en el menú principal🗄",
             "Advertencia {}/3, hemos descontado {} de sus {}"
         ]
     },
@@ -106,20 +116,20 @@ MESSAGES = {
         'MARKDOWN': STD_MK,
         "BTN": ReplyKeyboardMarkup(BTNS['EXTRACT'], True),
         "MSG": [
-            "`{}` no es una direccion valida, por favor, introduzca una direccion a la q podamos enviar su dinero (Numero de telefono o Tarjeta de Banco)",
-            "Usted no tiene saldo suficiente para hacer la extraccion solicitada.\nSu saldo actual es de: {} {}",
+            "`{}` no es una direccion valida 😕, por favor, introduzca una direccion🪪 a la que podamos enviar su dinero 💵 (Numero de telefono📱 o Tarjeta de Banco 💳)",
+            "🚫Usted no tiene saldo 💳 suficiente para hacer la extracción 💵 solicitada.\nSu saldo actual es de: {} {}❗",
             "🥺Su solicitud esta siendo procesada por los 🤵🏻‍♂️admin, por favor espere...👨🏻‍💻",
-            'Debe tener al menos {LIMIT_B} {TK_N} para efectuar el pago\n\nEsto significa que usted debera tener en su cuenta al menos {LIMIT_B} {TK_N} para efectuar el pago.',
-            'Por favor re_introduzca su direccion de destinatario',
-            "Usted ha introducido {} como nuevo destino, este correcto?"
+            '⚠️Debe tener al menos {LIMIT_B} {TK_N}❗ para efectuar el pago\n\nEsto significa que usted debera tener en su cuenta 💳 al menos {LIMIT_B} {TK_N} para efectuar el pago.⚠️\n\n💳Su cantidad actual es de: {MANY}',
+            'Por favor, vuelva a especificar la direccion 💳 de destino de su cuenta 🪪',
+            "Usted ha introducido *{}*🪪 como nuevo destino, este correcto?🤔"
         ]
     },
     "SEND": {
         'MARKDOWN': STD_MK,
         "BTN": None,
         "MSG": [
-            "No se ha detectado una foto, por favor, reenviela",
-            "Su pago ha sido enviado a su destino, por favor espere paciente a recibirlo"
+            "😢No se ha detectado una foto, por favor, reenviela📨",
+            "Su pago 💵 ha sido enviado a su destino📨, por favor espere paciente a recibirlo😁👍"
         ]
     },
     "PROOFS": {
@@ -133,8 +143,10 @@ MESSAGES = {
     'REDES': {
         'MARKDOWN': STD_MK,
         "MSG": [
-            "Estas son las redes q tenemos en este momento",
-            "No tenemos redes para seguir en este momento"
+            "😃Estas son las redes 🕸️ que tenemos en este momento👨‍💻",
+            "😢No tenemos redes 🕸️ para seguir en este momento👨‍💻",
+            "😃Estos son los bots 🤖 que tenemos en este momento👨‍💻",
+            "😢No tenemos bots 🤖 para para acceder en este momento👨‍💻"
         ],
         "BTN": None
     },
@@ -142,15 +154,15 @@ MESSAGES = {
         'MARKDOWN': STD_MK,
         'BTN': BTNS['GRUPO'],
         'MSG': [
-            "Hola {USER}, bienvenido! Pasate por mi privado si quieres hacer un dinerito extra ;)\n\n*ES GRATIS!* :D",
-            '{USER} se fue pal pingon :c',
-            'Agradecimientos especiales para `{INVITER}` por haber invitado a `{USER}` al grupo'
+            "Hola {USER}, bienvenido!😄 Pasate por mi privado 🕵️‍♂️ si quieres hacer un dinerito 💹 extra ;)\n\n*ES GRATIS!*😉",
+            '{USER} ha abandonado el grupo👥, pero lo recordare📲 x si aun desea volver 😢',
+            'Agradecimientos especiales 😄 para `{INVITER}` por haber invitado 📨 a `{USER}` al grupo 🤗'
             ]
     },
     "REGLAS": {
         "MARKDOWN": STD_MK,
         "MSG": [
-            "Mensaje de reglas q me debe dar el jhonny"
+            "Mensaje de reglas que me debe dar el jhonny"
         ],
         "BTN": None
     },
@@ -177,9 +189,9 @@ MESSAGES = {
         "MSG": [STD_NET],
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['FOLLOW'], callback_data=BTS['INLINE']['FOLLOW']),InlineKeyboardButton(text=BTS['INLINE']['REELS'], callback_data=BTS['INLINE']['REELS'])], [InlineKeyboardButton(BTS['INLINE']['COMENT'], callback_data=BTS['INLINE']['COMENT'])]]),
         "INST": {
-            "FOLLOW": "Siga las siguientes cuentas de instagram y suba una captura para probar su validez, una ves haya verificado esto, se le informara.",
+            "FOLLOW": "Siga las siguientes cuentas de instagram📷 y suba una captura de pantalla 🖼️ para probar su validez, una ves haya verificado ✅ esto, se le informara.📫",
             "REELS": "Los siguientes reels de instagram tienen códigos ⭕️ en algún punto del video 🖥, escríbalo ✍🏻 según lo encuentre para ganar tokens🏆",
-            "COMENT": "Comenta y dale LIKE a este reel/post de instagram y toma una captura de pantalla, una vez hecho esto, sube la captura y el bot procedera a validarla"
+            "COMENT": "Comenta y dale LIKE 👍 a este reel/post 😁 de instagram📷 y toma una captura de pantalla🖼️, una vez hecho esto, sube la captura📤 y el bot procedera a validarla📨"
         }
     },
     "TLGM": {
@@ -189,8 +201,8 @@ MESSAGES = {
             InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM']), InlineKeyboardButton(BTS['INLINE']['BOT'], callback_data=BTS['INLINE']['BOT'])
         ]]),
         "INST": {
-            "BOT": "Mensaje de instrucciones para cuando se quiera ganar con BOTs",
-            "SPAM": "Usted debera compartir las siguientes publicaciones en diferentes grupos _cada uno con mas de_ *150* _usuarios_ y pasar captura de su publicacion y la cantidad de miembros q tenga el grupo, o de preferencia, una captura donde se pueda visualizar ambas coasas, una vez el bot haya validado sus fotos, recibira un mensaje de respuesta avisandole, por favor envie varias fotos como prueba de sus publicaciones"
+            "BOT": "😃Los siguientes 🤖bots son parecidos a este, 😱¡con ellos tambien podras hacer un dinero extra!😉",
+            "SPAM": SPAM_MSG
         }
     },
     "WHTS": {
@@ -200,22 +212,22 @@ MESSAGES = {
             InlineKeyboardButton(BTS['INLINE']['SPAM'], callback_data=BTS['INLINE']['SPAM'])
         ]]),
         "INST": {
-            "SPAM": "Usted debera compartir las siguientes publicaciones en diferentes grupos _cada uno con mas de_ *150* _usuarios_ y pasar captura de su publicacion y la cantidad de miembros q tenga el grupo, o de preferencia, una captura donde se pueda visualizar ambas coasas, una vez el bot haya validado sus fotos, recibira un mensaje de respuesta avisandole, por favor envie varias fotos como prueba de sus publicaciones"
+            "SPAM": SPAM_MSG
         }
     },
     "MORE_WAYS": {
         "MARKDOWN": STD_MK,
-        "MSG": [f"Otras formas de ganar es invitando usuarios a usar el bot, ¿Como? ¡Pues facil! Usted debera ir a su apartado de referidos y darle invitar, recibira un link de referido, el cual debera compartir con sus amigos y familiares para q estos se refieran a usted, ganara 1 {TOKEN_NAME[1]} por cada referido y sus invitados entraran con 2 {TOKEN_NAME[1]}, ¡Todos Ganan usando {BOT_NAME}!"],
+        "MSG": [f"Otras formas de ganar 💹 es invitando usuarios 👤 a usar el 🤖bot, ¿Como? ¡Pues fácil! 🍼👶 Usted deberá ir a su apartado de referidos 👥 y hacer click en invitar, recibirá un link ⛓️ de referido, el cual deberá compartir 📬 con sus amigos y familiares 👨‍👩‍👧‍👦 para que estos se refieran a usted, ganara 1 {TOKEN_NAME[1]} por cada referido y sus invitados entrarán con 2 {TOKEN_NAME[1]}, ¡Todos Ganan usando {BOT_NAME}!😃"],
         "BTN": None
     },
     "INVALID_CODE": {
         "MARKDOWN": None,
-        "MSG": ["Por favor introduzca un codigo valido!"],
+        "MSG": ["📜Por favor introduzca un codigo valido!📝"],
         "BTN": ReplyKeyboardMarkup([[BTS['NO_CODE']]], resize_keyboard=True)
     },
     "NO_CODE": {
         "MARKDOWN": None,
-        "MSG": ["De acuerdo, desea hacer algo mas?"],
+        "MSG": ["😁De acuerdo, desea hacer algo mas?😊"],
         "BTN": None
     },
     "RIFAS": {
@@ -224,6 +236,16 @@ MESSAGES = {
         "BTN": ReplyKeyboardMarkup(BTNS['RIFA'], resize_keyboard=True)
     }
 }
+
+def format_mk(text: str):
+    for char in SPECIAL_CHARS:
+        escaped_char = '\\' + char
+        text = text.replace(char, escaped_char)
+    return text
+
+
+def unformat_mk(text: str):
+    return text.replace('\\', '')
 
 def get_msg(key, *args, **kargs):
     v = 0
@@ -242,7 +264,7 @@ def get_msg(key, *args, **kargs):
                 btns.append([])
                 for j in v:
                     # print(f"\t{i}\t{j}\t{kargs['user']}")
-                    btns[i].append(j.format(user=kargs['user']))
+                    btns[i].append(j.format(user=f"👤 {kargs['user']} 📑"))
             return {
                 "MARKDOWN": mk,
                 "MSG": msg,

@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardMarkup, ChatMemberUpdated, ChatMember, constants
+from telegram import Update, InlineKeyboardMarkup, ChatMemberUpdated, ChatMember, constants, ChatInviteLink
 from telegram.ext import ContextTypes
 # from pprint import pprint
 
@@ -41,6 +41,7 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     cause = update.chat_member.from_user
     new_user = update.chat_member.new_chat_member.user
+    print(f"{new_user.full_name} was enter by {update.chat_member.invite_link}")
 
     if not was_member and is_member:
         kb = InlineKeyboardMarkup(m['BTN'])
@@ -58,33 +59,6 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                         {'users': new_user.id}
                 }
             )
-            # c_user = DB['users'].find_one({'t_id': cause.id})   # Cause User
-            # if c_user['inviteds']['count'] == 5 and c_user['inGroup']:
-            #     await context.bot.send_message(chat_id=c_user['t_id'], text="Usted ya ha sido activado!!")
-            #     DB['users'].update_one(
-            #         {'t_id': cause.id},
-            #         {
-            #             "$set":
-            #             {'active': True}
-            #         }
-            #     )
-            #     if c_user['referrer']:
-            #         DB['users'].update_one(
-            #             {'t_id': c_user['referrer']},
-            #             {
-            #                 '$inc': 
-            #                     {'token_b': 1},
-            #             }
-            #         )
-            #         DB['users'].update_one(
-            #             {'t_id': cause.id},
-            #             {
-            #                 '$inc': 
-            #                     {'token_b': 2},
-            #             }
-            #         )
-            #         await context.bot.send_message(chat_id=c_user['t_id'], text=f"Ha recibido *1 {TOKEN_NAME[1]}*")
-            #         await context.bot.send_message(chat_id=c_user['referrer'], text=f"Usted ha recibido *2 {TOKEN_NAME[1]}*!!")
             await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][2].format(INVITER=update.chat_member.from_user.full_name, USER=incoming))
 
     elif was_member and not is_member:

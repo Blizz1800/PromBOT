@@ -2,7 +2,7 @@ from telegram import Update, constants, Bot, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from . import DB, control, analytics
-from .consts import BTS, get_msg, MARKDOWN, ADMINS
+from .consts import BTS, get_msg, MARKDOWN, ADMINS, BUILDING
 
 async def base_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message.text
@@ -13,7 +13,7 @@ async def base_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await get_info(update, context)
     elif msg == BTS['RIFAS']['POST']:
         analytics.button_press(BTS['RIFAS']['POST'], update.effective_chat.id)
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Under Construction!")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=BUILDING)
     elif msg == BTS['BACK']:
         return await control('START', update, context, -1)
     return 0

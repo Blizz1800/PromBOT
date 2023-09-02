@@ -1,15 +1,16 @@
-from telegram import Update, ChatMemberBanned, ChatMemberLeft, ReplyKeyboardMarkup
+from telegram import Update, ChatMemberBanned, ChatMemberLeft, ReplyKeyboardMarkup, error
 from telegram.constants import ChatAction
 from telegram.ext import ContextTypes
 
-from . import DB, consts
+from . import DB, consts, control
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=True) -> None:
-
+    if update.effective_chat.id < 0:
+        return
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
     id = update.effective_chat.id
-    name = update.effective_user.full_name
-    user = f"@{update.effective_chat.username}"   
+    name = consts.format_mk(update.effective_user.full_name)
+    user = consts.format_mk(f"@{update.effective_chat.username}")
     tk_b_start = 0
 
     referrer = None     # Referidor [REFERIDO PADRE!!]
@@ -32,19 +33,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
                             username = referral['user'] 
                         else:
                             username = referral['name']                    
-                        # DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
-                        await context.bot.send_message(referral['t_id'], text=f"Has referido a @{update.effective_chat.username}, usted recibira su recomenpsa cuando @{update.effective_chat.username} sea usuario activo")
-                        await context.bot.send_message(chat_id=id, text=f"Hello {update.effective_chat.first_name}! you have invited by {referral['user']}, you will earn 2 {consts.TOKEN_NAME[1]} when you have been activated")
+                        DB['users'].update_one({"t_id": referrer}, {"$inc": {'token_b': 1}})
+                        reff = name
+                        if user != "@None":
+                            reff = user
+
+                        await context.bot.send_message(referral['t_id'], text=f"Has referido a {reff}, has ganado *+1 {consts.TOKEN_NAME[1]}*", parse_mode=consts.MARKDOWN)
+                        await context.bot.send_message(chat_id=id, text=f"Hola {update.effective_chat.first_name}! has sido invitado por {referral['user']}, obtendras 2 {consts.TOKEN_NAME[1]} cuando hayas sido activado!")
                         # tk_b_start = 2
                 else:
-                    await context.bot.send_message(chat_id=id, text=f"No user found with this id ({context.args[0]})")
+                    await context.bot.send_message(chat_id=id, text=f"No existe un usuario con este ID({context.args[0]})")
             else:   # Si EXISTIMOS en la DB
                 await context.bot.send_message(chat_id=id, text="Usted ya es usuario del bot!")
                 
               
                 
 
-    group_id = '@test_blizzbot_group'
+    group_id = consts.GROUP_ID
     user_in_chat = await context.bot.get_chat_member(group_id, update.effective_user.id)
 
     codes = DB['codes'].find({})
@@ -92,8 +97,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=Tr
         commands += f"/{i}\n"
     
     if start_msg:
-        btns = [[consts.BTS['FOLLOWERS']],
-            [name, consts.BTS['REFERIDOS']['KEY']],
-            [consts.BTS['MONEY']['GET'], consts.BTS['MONEY']['POST']]]
-        await context.bot.send_message(chat_id=id, text=f"I'm a bot, please talk to me!\nThere are my commands: \n{commands}", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
+        # btns = [[consts.BTS['FOLLOWERS']],
+        #     [name, consts.BTS['REFERIDOS']['KEY']],
+        #     [consts.BTS['MONEY']['GET'], consts.BTS['MONEY']['POST']]]
+        await control("START:1", update, context)
+        # await context.bot.send_message(chat_id=id, text="", reply_markup=ReplyKeyboardMarkup(btns, resize_keyboard=True))
     return 0

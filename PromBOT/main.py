@@ -1,11 +1,11 @@
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, ChatMemberHandler
-from telegram.ext.filters import TEXT, COMMAND, PHOTO, StatusUpdate
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, ChatMemberHandler, PicklePersistence
+from telegram.ext.filters import TEXT, COMMAND, PHOTO, Regex
 from telegram import Update
 from dotenv import load_dotenv
 from os import getenv
 
 from .db_init import db_init_update
-from .commands import consts, start, pagos, reglas, code, start_handler, im_user, db_len, referrers, money_handler, cmd_handlers, chat_join, rifa
+from .commands import consts, start, pagos, reglas, code, start_handler, im_user, db_len, referrers, money_handler, cmd_handlers, chat_join, rifa, spam
 
 from warnings import filterwarnings
 from telegram.warnings import PTBUserWarning
@@ -13,6 +13,7 @@ from telegram.warnings import PTBUserWarning
 filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
 
 rules = CommandHandler('rules', reglas.get)
+get_spam = CommandHandler('get_spam', spam.get)
 get_pay = CommandHandler('get_pays', pagos.get_pays)
 code = ConversationHandler(
                 per_user=True,
@@ -22,7 +23,15 @@ code = ConversationHandler(
                 },
                 fallbacks=[],
             )
-
+spam_h = ConversationHandler(
+    per_user=True,
+    entry_points=[CommandHandler('spam', spam.insert)],
+    states={
+        0: [MessageHandler(TEXT & (~COMMAND), spam.advice),],
+        1: [MessageHandler(TEXT & (~COMMAND), spam.advice_send),],
+    },
+    fallbacks=[]
+)
 entry = ConversationHandler(
         per_user=True,
         entry_points=[CommandHandler('start', start.start), MessageHandler(TEXT & (~COMMAND), start_handler.start_handler)],
@@ -56,7 +65,9 @@ entry = ConversationHandler(
         fallbacks=[
             code,
             get_pay,
-            rules
+            rules,
+            get_spam,
+            spam_h
         ],
     )
 
@@ -80,12 +91,14 @@ HANDLERS = [
     ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.ig_comments, pattern=consts.BTS['INLINE']['COMENT'])],
         states={
-            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end)]
+            0: [MessageHandler(PHOTO & (~TEXT & ~COMMAND), money_handler.get_photo), CommandHandler('end', money_handler.ig_end), CallbackQueryHandler(money_handler.ig_comments, pattern=consts.BTS['INLINE']['COMENT'])]
         },
         fallbacks=[],
         per_user=True,
     ),
     code,
+    get_spam,
+    spam_h,
     get_pay,
     rules,
     entry,
@@ -99,7 +112,7 @@ HANDLERS = [
     ),
     ChatMemberHandler(callback=chat_join.new_member, chat_member_types=ChatMemberHandler.CHAT_MEMBER),
     CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['ACTIVATE']),
-    # CallbackQueryHandler(start_handler.activate_handler, pattern=consts.BTS['INLINE']['UPDATE']),
+    CallbackQueryHandler(start_handler.send_how_to, pattern=consts.BTS['INLINE']['SEND_PHOTO']),
     CallbackQueryHandler(start_handler.update_handler, pattern=consts.BTS['INLINE']['UPDATE']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['SUB']),
     CallbackQueryHandler(money_handler.buttons, pattern=consts.BTS['INLINE']['CODE']),
@@ -109,6 +122,7 @@ HANDLERS = [
     CallbackQueryHandler(money_handler.admin_btn_v2, pattern=f"{consts.BTS['INLINE']['DENY']}2"),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['ACCEPT']),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['DENY']),
+    CallbackQueryHandler(spam.remove, pattern="rem"),
     CallbackQueryHandler(pagos.get_more, pattern=consts.BTS['INLINE']['MORE']),
     CommandHandler('im_user', im_user.im_user),
     CommandHandler('db_len', db_len.db_len),
@@ -118,7 +132,8 @@ HANDLERS = [
 # Funcion Principal
 def main():
     load_dotenv()
-    app = ApplicationBuilder().token(getenv('TOKEN')).build()
+    persistence = PicklePersistence(filepath="data.bin")
+    app = ApplicationBuilder().token(getenv('TOKEN')).persistence(persistence=persistence).build()
     app.add_handlers(HANDLERS)
     db_init_update()
     print('Bot Running!')

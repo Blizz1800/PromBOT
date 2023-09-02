@@ -2,11 +2,12 @@ from telegram import Update, ChatMemberBanned, ChatMemberLeft
 from telegram.constants import ChatAction
 from telegram.ext import ContextTypes
 
+from .consts import GROUP_ID
 
 async def im_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
     user_id = update.effective_chat.id
-    group_id = '@test_blizzbot_group'
+    group_id = GROUP_ID
     user_in_chat = await context.bot.get_chat_member(group_id, user_id)
     
     if not isinstance(user_in_chat, (ChatMemberBanned, ChatMemberLeft)) :

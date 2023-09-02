@@ -1,10 +1,10 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, constants
-from PromBOT.commands.consts import TOKEN_NAME, BTS
+from PromBOT.commands.consts import TOKEN_NAME, BTS, unformat_mk
 from PromBOT.commands import DB
 
 async def get_info(update, context):
     me = DB['users'].find_one({'t_id': update.effective_chat.id})
-    resp = f"*{me['name']}*\n\n_En el grupo_: "
+    resp = f"*{unformat_mk(me['name'])}*\n\n_En el grupo_: "
     line_btn = [[]]
     
     if me['inGroup']:

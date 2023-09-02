@@ -64,6 +64,8 @@ problemas tecnicos
 
 [x] Sistema de estadsticas de ganancia de tokens
 
+[x] Compartir SPAM mediante botones inline directo a las redes
+
 ### Bug Fixing
 [x] Error en el nombre de un boton
 
