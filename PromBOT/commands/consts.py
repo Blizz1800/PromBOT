@@ -181,7 +181,7 @@ MESSAGES = {
         "BTN": InlineKeyboardMarkup([[InlineKeyboardButton(text=BTS['INLINE']['SUB'], callback_data=BTS['INLINE']['SUB']),InlineKeyboardButton(text=BTS['INLINE']['CODE'], callback_data=BTS['INLINE']['CODE'])]]),
         "INST": {
             "SUB": f"Para empezar a ganar dinero 💵 deberás subscribirte🔔 y subir una captura de pantalla📱 para verificar que has realizado la acción✅.\n\nEl bot 🖲lo revisará.\n\nLa recompensa 🪙 por subscribirse es un {TOKEN_NAME[1]} ",
-            "CODE": f"En los videos 🖥 aparecen diversos códigos ⭕️ en la parte inferior derecha del video.\n\nDebes escribirlos ✍🏻 para recibir 🪙 un {TOKEN_NAME[1]} por código."
+            "CODE": f"En los videos 🖥 aparecen diversos códigos ⭕️ en la parte inferior derecha del video.\n\nDebes escribirlos ✍🏻 para recibir un {TOKEN_NAME[1]} por código."
         }
     },
     "IG": {

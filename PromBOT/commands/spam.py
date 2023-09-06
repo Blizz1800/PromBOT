@@ -20,6 +20,14 @@ def format_tlgm(text: str):
     t = re.sub(r'~(.*?)~', r'~~\1~~', t)
     return t
 
+def format_ref(text: str):
+    regex = r"https://wa\.me/(\+\d+)"
+    match = re.search(regex, text)
+    t = None
+    if match:
+        t = match.group(1)
+    return t
+
 async def insert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.effective_user.id in ADMINS:
         return -1
@@ -27,21 +35,35 @@ async def insert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(update.effective_user.id ,txt)
     return 0
 
+
+async def insert_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['spam'] = update.message.text_markdown_v2
+    txt = "Por favor, inserte el link de referencia de su usuario para la red de whatsapp"
+    await context.bot.send_message(update.effective_user.id ,txt)
+    return 1
+    
+
 async def advice(update: Update, context: ContextTypes.DEFAULT_TYPE): 
-    msg = update.message.text_markdown_v2
-    whts = format_whts(msg)
-    tlgm = format_tlgm(msg)
+    ref = update.message.text
+    msg:str = context.user_data['spam']
+    whts = format_whts(msg.replace('\\', ''))
+    tlgm = format_tlgm(msg.replace('\\', ''))
+    char_list = list('*_')
+    for i in char_list:
+        msg = msg.replace(f'\\{i}', i)
     db = get_db('static')['spam']
     db.insert_one({
         "priority": 1,
         "msg": msg,
         'tlgm': tlgm,
         'whts': whts,
+        'ref': ref,
+        'phone': format_ref(ref),
         't_id': update.effective_user.id
     })
     
     await context.bot.send_message(update.effective_chat.id, "Se ha agregado su mensaje:\n\n`{}`\n\ndesea avisar a los usuarios??".format(msg), parse_mode=STD_MK+'V2', reply_markup=ReplyKeyboardMarkup([["Si", "No"]], resize_keyboard=True))
-    return 1
+    return 2
 
 async def advice_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text.lower()
@@ -74,11 +96,57 @@ async def get(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not user:
             user = "Unknown"
         txt = "Agregado por: _{}_\n\nPrioridad: *{}*\n\nMensaje: `{}`".format(user['name'], i['priority'], i['msg'])
-        print(txt)
+        # print(txt)
         kb = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(BTS['INLINE']['REMOVE'], callback_data=f"rem|{i['_id']}")]]
+            [
+                [InlineKeyboardButton('⬇️', callback_data=f'prior|{i["_id"]}|-1'), InlineKeyboardButton('⬆️', callback_data=f'prior|{i["_id"]}|1')],
+                [InlineKeyboardButton(BTS['INLINE']['REMOVE'], callback_data=f"rem|{i['_id']}")]
+            ]
         )
         await context.bot.send_message(update.effective_chat.id, txt, parse_mode=STD_MK+'V2', reply_markup=kb)
+
+async def prior(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data
+    data = data.split('|')
+    _id = data[1]
+    oper = int(data[2])
+    
+    p_max, p_min = (10, 1)
+
+    udb = get_db()['users']
+    db = get_db('static')['spam']
+    doc = db.find_one({'_id': ObjectId(_id)})
+    priority = doc['priority']
+    if (priority == p_min and oper < 0) or (priority == p_max and oper > 0):
+        oper = 0
+
+    db.find_one_and_update(
+        {'_id': ObjectId(_id)},
+        {
+            '$inc': {
+                'priority': oper
+            }
+        }
+    )
+
+    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
+    doc = db.find_one({'_id': ObjectId(_id)})
+    user = udb.find_one({'t_id': doc['t_id']})
+    if not user:
+        user = "Unknown"
+    txt = "Agregado por: _{}_\n\nPrioridad: *{}*\n\nMensaje: `{}`".format(user['name'], doc['priority'], doc['msg'])
+    kb = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton('⬇️', callback_data=f'prior|{doc["_id"]}|-1'), InlineKeyboardButton('⬆️', callback_data=f'prior|{doc["_id"]}|1')],
+            [InlineKeyboardButton(BTS['INLINE']['REMOVE'], callback_data=f"rem|{doc['_id']}")]
+        ]
+    )
+    try:
+        await query.edit_message_text(txt, parse_mode=STD_MK+'V2', reply_markup=kb)
+    except:
+        pass
+    await query.answer()
 
 async def remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -87,8 +155,8 @@ async def remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _id = data.split('|')[1]
 
     db = get_db('static')['spam']
-    tmp = db.find_one_and_delete({'_id': ObjectId(_id)})
-    print()
-    print(_id)
-    print(tmp)
+    db.find_one_and_delete({'_id': ObjectId(_id)})
+    # print()
+    # print(_id)
+    # print(tmp)
     await query.delete_message()

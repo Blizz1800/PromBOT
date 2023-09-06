@@ -7,7 +7,11 @@ from . import DB, consts, control
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, start_msg=True) -> None:
     if update.effective_chat.id < 0:
         return
-    await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
+    try :
+        await context.bot.send_chat_action(update.effective_chat.id, ChatAction.TYPING)
+    except error.Forbidden as e:
+        print(e)
+        print(update.effective_user)
     id = update.effective_chat.id
     name = consts.format_mk(update.effective_user.full_name)
     user = consts.format_mk(f"@{update.effective_chat.username}")

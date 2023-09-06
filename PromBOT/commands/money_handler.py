@@ -76,12 +76,12 @@ async def tlgm_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lista = get_spam()
         if len(lista)> 0:
             for i in lista:
-                url = "https://api.whatsapp.com/send?text={text}".format(text=quote_plus(i[red]))
+                url = "https://api.whatsapp.com/send?text={text}".format(text=quote_plus(i[red] + f"\n\n{i['ref']}"))
                 if red == 'tlgm':
-                    url = 'tg://msg_url?url={url}&text={text}'.format(url=f"https://t.me/test_promblizzbot?start={update.effective_user.id}", text=quote_plus(i[red]))
+                    url = 'tg://msg_url?url={url}&text={text}'.format(url=quote_plus(i[red]), text=quote_plus(f"\n`{i['phone']}`"))
                 kb = InlineKeyboardMarkup([[InlineKeyboardButton('Compartir', url=url)]])
                 await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
-                await context.bot.send_message(update.effective_chat.id, f"{i[red]}", reply_markup=kb, parse_mode=MARKDOWN+'V2')
+                await context.bot.send_message(update.effective_chat.id, f"{i['msg']}", reply_markup=kb, parse_mode=MARKDOWN+'V2')
         else:
             await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
             await context.bot.send_message(update.effective_chat.id, "No tenemos publicaciones en estos momentos, por favor, vuelva mas tarde", parse_mode=MARKDOWN)
@@ -139,6 +139,8 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # print(context.user_data['METHOD'])
     # print(method)
 
+    # print(photo)
+
     data_id = DB['requests'].insert_one(
                 {
                     "t_id": update.effective_chat.id,
@@ -151,7 +153,7 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ).inserted_id
     context.user_data['fotos'].append([data_id, photo.file_id])
     m = MESSAGES['PROOFS']
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][0].format(CMD='/end'))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=m['MSG'][1].format(CMD='/end'))
 
 async def envio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo
@@ -273,7 +275,7 @@ async def target_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         money.update_target(update.effective_chat.id, msg)
         yes_no_kb = ReplyKeyboardMarkup([[BTS['YES'], BTS['NO']]], resize_keyboard=True)
-        print(8)
+        # print(8)
         await context.bot.send_message(update.effective_chat.id, reply_markup=yes_no_kb, text=m['MSG'][5].format(msg))
         return 1
 
@@ -542,7 +544,6 @@ async def money_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     btns.append([BTS['NET']['TLGM'], BTS['NET']['WHTS']])
     btns.append([BTS['BACK']])
 
-    await context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.TYPING)
     id = update.effective_chat.id
     msg = update.message.text
     DB['users'].update_many(

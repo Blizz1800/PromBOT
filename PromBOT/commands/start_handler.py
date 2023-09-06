@@ -154,7 +154,6 @@ async def send_how_to(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.bot.send_chat_action(update.effective_chat.id, constants.ChatAction.UPLOAD_PHOTO)
     query = update.callback_query
     data = query.data
-    
     photos = [
             InputMediaPhoto(open('./files/static/agregar_users1.webp', 'rb')),
             InputMediaPhoto(open('./files/static/agregar_users2.webp', 'rb'))

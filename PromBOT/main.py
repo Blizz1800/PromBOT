@@ -27,8 +27,9 @@ spam_h = ConversationHandler(
     per_user=True,
     entry_points=[CommandHandler('spam', spam.insert)],
     states={
-        0: [MessageHandler(TEXT & (~COMMAND), spam.advice),],
-        1: [MessageHandler(TEXT & (~COMMAND), spam.advice_send),],
+        0: [MessageHandler(TEXT & (~COMMAND), spam.insert_2),],
+        1: [MessageHandler(TEXT & (~COMMAND), spam.advice),],
+        2: [MessageHandler(TEXT & (~COMMAND), spam.advice_send),],
     },
     fallbacks=[]
 )
@@ -71,7 +72,13 @@ entry = ConversationHandler(
         ],
     )
 
+async def all(u, c):
+    query = u.callback_query
+    print(query.data)
+
+
 HANDLERS = [
+    CallbackQueryHandler(all),
     ConversationHandler(
         entry_points=[CallbackQueryHandler(money_handler.tlgm_spam, pattern=consts.BTS['INLINE']['SPAM']),CallbackQueryHandler(money_handler.tlgm_bot, pattern=consts.BTS['INLINE']['BOT'])],
         states={
@@ -123,6 +130,7 @@ HANDLERS = [
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['ACCEPT']),
     CallbackQueryHandler(money_handler.admin_btn, pattern=consts.BTS['INLINE']['DENY']),
     CallbackQueryHandler(spam.remove, pattern="rem"),
+    CallbackQueryHandler(spam.prior, pattern="prior"),
     CallbackQueryHandler(pagos.get_more, pattern=consts.BTS['INLINE']['MORE']),
     CommandHandler('im_user', im_user.im_user),
     CommandHandler('db_len', db_len.db_len),
