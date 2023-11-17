@@ -6,8 +6,6 @@ COPY . /app/
 
 SHELL [ "/bin/bash", "-c" ]
 
-ENV TOKEN "6592524009:AAFp6S6PwNUXePWHRK_luYCZJObWrHZfPWc"
-ENV MONGO_URI "mongodb+srv://blizzsoftword:eddyeddy@vendermejor.8r3dw9b.mongodb.net/?retryWrites=true&w=majority"
 ENV BOT_DIR "/app"
 
 RUN python3 -m venv /app

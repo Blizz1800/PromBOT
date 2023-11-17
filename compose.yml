@@ -1,0 +1,8 @@
+services:
+  bot:
+    build: .
+    environment:
+      - TOKEN="6592524009:AAFp6S6PwNUXePWHRK_luYCZJObWrHZfPWc"
+      - MONGO_URI="mongodb+srv://mongo/?retryWrites=true&w=majority"
+  mongo:
+    image: mongodb/mongodb-community-server
