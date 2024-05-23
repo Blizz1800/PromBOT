@@ -1,4 +1,4 @@
 ## The following requirements were added by pip freeze:
-pymongo==4.4.1
+pymongo==4.6.3
 python-dotenv==1.0.0
 python-telegram-bot==20.4
